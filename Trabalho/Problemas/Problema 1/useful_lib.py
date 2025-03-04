@@ -13,12 +13,12 @@ def cria_array_tempos(Dt = dt, n_Pontos = n_pontos):
 	array_tempos = np.linspace(0, (n_Pontos - 1) * Dt, n_Pontos) #cria o vetor com os tempos igualmente espaçados
 	return array_tempos
 
-def simula_sinal(array_tempos, omega_0 = omega, T_0 = T):
-	sinal = np.exp(-array_tempos/T_0) * np.exp(1j * omega_0 * array_tempos)
+def simula_sinal(array_tempos, omega_0 = omega, T_0 = T, S_0 = S_0):
+	sinal = S_0 * np.exp(-array_tempos/T_0) * np.exp(1j * omega_0 * array_tempos) #cria o vetor com o sinal simulado
 	return sinal
 
 def mostra_sinal(tempo, sinal, separa_componentes = True):
-	if separa_componentes:
+	if separa_componentes: 
 		plt.plot(tempo, sinal.real, label="Parte real")
 		plt.plot(tempo, sinal.imag, label="Parte imaginária")
 	else:
