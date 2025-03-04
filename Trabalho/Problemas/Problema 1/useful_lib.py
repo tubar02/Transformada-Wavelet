@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #inicialização dos dados
-n_pontos = 2 ** 11 
-dt = 5 * 10 ** (-4)
 with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros dados
 	S_0 = float(valores_iniciais.readline().split()[2])
 	omega = float(valores_iniciais.readline().split()[2])
 	T = float(valores_iniciais.readline().split()[2])
+	dt = float(valores_iniciais.readline().split()[2])
+	n_pontos = int(valores_iniciais.readline().split()[2])
 
 def cria_array_tempos(Dt = dt, n_Pontos = n_pontos):
 	array_tempos = np.linspace(0, (n_Pontos - 1) * Dt, n_Pontos) #cria o vetor com os tempos igualmente espaçados
