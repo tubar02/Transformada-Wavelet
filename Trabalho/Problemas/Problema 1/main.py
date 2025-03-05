@@ -126,7 +126,11 @@ def menu():
 			print_menu()
 		
 		elif escolha == "F":
-			pass
+			tempos = ul.cria_array_tempos(dt, n_pontos)
+			sinal = ul.simula_sinal(tempos, omega, T, S_0)
+			ft = ul.aplica_FFT_em_sinal(sinal)
+			frequencias = ul.cria_array_frequencias(n_pontos, dt)
+			ul.mostra_FT(frequencias, ft)
 
 		elif escolha == "M":
 			print("\n")
