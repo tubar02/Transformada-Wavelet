@@ -32,14 +32,38 @@ def mostra_sinal(tempo, sinal, separa_componentes = True):
 	plt.show()
 
 def aplica_FFT_em_sinal(sinal):
-	return 0
+	return np.fft.fft(sinal)
+
+def cria_array_frequencias(n_pontos, dt):
+	return np.fft.fftfreq(n_pontos, dt)
+
+def mostra_FT(frequencia, ft, separa_componentes = False):
+	if separa_componentes:
+		plt.plot(frequencia, ft.real, label="Parte real")
+		plt.plot(frequencia, ft.imag, label="Parte imaginária")
+	else:
+		plt.plot(frequencia, np.abs(ft))
+	plt.xlabel('Frequência (Hz)')
+	plt.ylabel('Magnitude')
+	plt.title('Espectro de Frequência do Sinal')
+	plt.grid()
+	plt.show()
 
 def main():
 	tempo = cria_array_tempos(0.0005, 2048)
-	sinal = simula_sinal(tempo, 50)
+	sinal = simula_sinal(tempo, 628)
 
 	mostra_sinal(tempo, sinal)
-	mostra_sinal(tempo, sinal, False)
+
+	fft_sinal = np.fft.fft(sinal)
+	frequencias = np.fft.fftfreq(n_pontos, dt)
+
+	plt.plot(frequencias, np.abs(fft_sinal))
+	plt.xlabel('Frequência (Hz)')
+	plt.ylabel('Magnitude')
+	plt.title('Espectro de Frequência do Sinal')
+	plt.grid()
+	plt.show()
 
 	return 0
 
