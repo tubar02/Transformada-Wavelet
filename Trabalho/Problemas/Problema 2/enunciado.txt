@@ -1,9 +1,2 @@
-Tem-se a função S(t) dada:
-
-S = S_0 * \exp{-t/T} * \exp{i * \omega * t}
-
-Essa função simula um sinal de ressonância magnética.
-A partir dela, quer-se aplicar a Transformada de Fourier (FT) num sinal de 2048 pontos, espaçados por um \delta t = 5 * 10^(-4) segundos.
-Assuma S_0 = 1.
-Simular com \omega assumindo valores {0, x}, tal que 0 < x < 500. 
-Buscar o tempo de relaxação T na literatura, e usar no código. Também deve-se variá-lo.
+Tendo os códigos desenvolvidos para o problema anterior, implementar uma forma de simular o
+sinal vindo de tantas fontes quanto se queira.
