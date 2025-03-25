@@ -23,7 +23,7 @@ def print_parametros():
 	print(f"\t(2) T = {T}\t(4) dt = {dt}\t")
 
 def menu_muda_sinal():
-	global S_0, omega, T, dt, n_pontos, tempos, sinal, nome_sinal
+	global nome_sinal
 
 	def print_menu():
 		print("Você escolheu mudar o formato do sinal.")
@@ -36,6 +36,7 @@ def menu_muda_sinal():
 
 	print_menu()
 	'''
+	salvou = False
 	while True:
 		escolha = str(input("\nDigite sua escolha: ")).capitalize()
 		print("\n")
@@ -60,25 +61,43 @@ def menu_muda_sinal():
 				print("Esse é o sinal padrão, e não pode ser alterado.")
 				continue
 
-			with open(f"Sinais\{nome_sinal}.txt", "w") as arquivo_sinal:
-				arquivo_sinal.write(str(n_pontos) + "\n")
-				arquivo_sinal.write(" ".join([str(i) for i in sinal]) + "\n")
-				arquivo_sinal.write(" ".join([str(i) for i in tempos]) + "\n")
+			salva_sinal(sinal, tempos, nome_sinal)
 			
 			print("\nO sinal foi salvo com sucesso.")
+			salvou = True
 		
 		elif escolha == "D":
 			print("Você escolheu apagar um sinal.\n")
-			nome_sinal = input("Digite o nome do sinal que deseja excluir: ")
+			nome_apaga = input("Digite o nome do sinal que deseja excluir: ")
 
-			if nome_sinal == "std":
+			if nome_apaga == "std":
 				print("Esse é o sinal padrão, e não pode ser excluído.")
 				continue
 
-			caminho = Path(f'Sinais/{nome_sinal}.txt')
+			caminho = Path(f'Sinais/{nome_apaga}.txt')
 			if caminho.exists():
 				caminho.unlink()
 				print("O sinal foi apagado.")
+			else:
+				print("Não existe nenhum sinal com esse nome.")
+			
+		elif escolha == "F":
+			print("Você escolheu focar em outro sinal.\n")
+			nome_foca = input("Digite o nome do sinal que deseja analisar: ")
+
+			caminho = Path(f'Sinais/{nome_foca}.txt')
+			if caminho.exists() and salvou:
+				nome_sinal = nome_foca
+				print("O foco foi alterado.")
+			elif not salvou:
+				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
+				escolha2 = str(input()).capitalize()
+
+				if escolha2 == "N":
+					continue
+				elif escolha2 == "Y":
+					nome_sinal = nome_foca
+					print("O foco foi alterado.")
 			else:
 				print("Não existe nenhum sinal com esse nome.")
 
@@ -90,8 +109,16 @@ def menu_muda_sinal():
 
 			if escolha2 == "N":
 				continue
-			elif escolha2 == "Y":
+			elif escolha2 == "Y" and salvou:
 				break
+			elif not salvou:
+				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
+				escolha3 = str(input()).capitalize()
+
+				if escolha3 == "N":
+					continue
+				elif escolha3 == "Y":
+					break
 	'''
 	print("\n")
 	def print_menu():
@@ -111,7 +138,6 @@ def menu_muda_sinal():
 		print("\n")
 
 		if escolha in "12345":
-
 			if escolha == "1":
 				print("Você escolheu mudar S_0.")
 				S_0 = float(input("Digite o novo valor de S_0: "))
@@ -178,21 +204,20 @@ def menu_muda_sinal():
 		
 		elif escolha == "F":
 			print("Você escolheu focar em outro sinal.\n")
-			nome_sinal = input("Digite o nome do sinal que deseja analisar: ")
+			nome_foca = input("Digite o nome do sinal que deseja analisar: ")
 
-			if nome_sinal == "std":
-				print("Esse é o sinal padrão, e não pode ser excluído.")
-				continue
-
-			caminho = Path(f'Sinais/{nome_sinal}.txt')
+			caminho = Path(f'Sinais/{nome_foca}.txt')
 			if caminho.exists():
-				caminho.unlink()
-				print("O sinal foi apagado.")
+				print(caminho)
+				nome_sinal = nome_foca
+				print("O foco foi alterado.")
 			else:
 				print("Não existe nenhum sinal com esse nome.")
 
 def menu():
-	global S_0, omega, T, dt, n_pontos, tempos, sinal, nome_sinal
+	global nome_sinal
+
+	tempos, sinal = ul.le_arquivo_sinal(nome_sinal)
 
 	def print_menu():
 		print("Bem-vindo à resolução do Problema 1!") 
@@ -218,7 +243,7 @@ def menu():
 		
 		elif escolha == "F":
 			ft = ul.aplica_FFT_em_sinal(sinal)
-			frequencias = ul.cria_array_frequencias(n_pontos, dt)
+			frequencias = ul.cria_array_frequencias(tempos)
 			ul.mostra_FT(frequencias, ft)
 
 		elif escolha == "M":

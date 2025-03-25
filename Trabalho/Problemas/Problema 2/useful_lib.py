@@ -9,6 +9,19 @@ with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros
 	dt = float(valores_iniciais.readline().split()[2])
 	n_pontos = int(valores_iniciais.readline().split()[2])
 
+def le_arquivo_sinal(nome_arq):
+	with open(f"Sinais/{nome_arq}.txt", "r") as arquivo_sinal:
+		n_pontos = arquivo_sinal.readline()
+		sinal = [float(i) for i in arquivo_sinal.readline().split()]
+		tempos = [float(i) for i in arquivo_sinal.readline().split()]
+	return sinal, tempos
+
+def salva_sinal(sinal, tempos, nome_sinal):
+	with open(f"Sinais\{nome_sinal}.txt", "w") as arquivo_sinal:
+		arquivo_sinal.write(str(n_pontos) + "\n")
+		arquivo_sinal.write(" ".join([str(i) for i in sinal]) + "\n")
+		arquivo_sinal.write(" ".join([str(i) for i in tempos]) + "\n")
+
 def cria_array_tempos(Dt = dt, n_Pontos = n_pontos):
 	array_tempos = np.linspace(0, (n_Pontos - 1) * Dt, n_Pontos) #cria o vetor com os tempos igualmente espaçados
 	return array_tempos
@@ -34,7 +47,9 @@ def mostra_sinal(tempo, sinal, separa_componentes = True):
 def aplica_FFT_em_sinal(sinal):
 	return np.fft.fft(sinal)
 
-def cria_array_frequencias(n_pontos, dt):
+def cria_array_frequencias(tempos):
+	n_pontos = len(tempos)
+	dt = tempos[1] - tempos[0]
 	return np.fft.fftfreq(n_pontos, dt)
 
 def mostra_FT(frequencia, ft, separa_componentes = False):
