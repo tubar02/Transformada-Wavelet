@@ -12,13 +12,13 @@ with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros
 def le_arquivo_sinal(nome_arq):
 	with open(f"Sinais/{nome_arq}.txt", "r") as arquivo_sinal:
 		n_pontos = arquivo_sinal.readline()
-		sinal = [float(i) for i in arquivo_sinal.readline().split()]
-		tempos = [float(i) for i in arquivo_sinal.readline().split()]
+		sinal = np.array([complex(i) for i in arquivo_sinal.readline().split()])
+		tempos = np.array([float(i) for i in arquivo_sinal.readline().split()])
 	return sinal, tempos
 
 def salva_sinal(sinal, tempos, nome_sinal):
 	with open(f"Sinais\{nome_sinal}.txt", "w") as arquivo_sinal:
-		arquivo_sinal.write(str(n_pontos) + "\n")
+		arquivo_sinal.write(str(len(sinal)) + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in sinal]) + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in tempos]) + "\n")
 
