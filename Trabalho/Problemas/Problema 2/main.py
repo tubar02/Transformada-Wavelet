@@ -1,4 +1,5 @@
 import useful_lib as ul
+from pathlib import Path
 
 #recebe os dados da biblioteca
 def reseta_parametros():
@@ -9,7 +10,10 @@ def reseta_parametros():
 	n_pontos = ul.n_pontos
 	return S_0, omega, T, dt, n_pontos
 
-S_0, omega, T, dt, n_pontos = reseta_parametros()
+S_0, omega, T, dt, n_pontos = reseta_parametros() #cria as variáveis globais que serão usadas no programa
+tempos = ul.cria_array_tempos(dt, n_pontos) 
+sinal = ul.simula_sinal(tempos, omega, T, S_0)
+nome_sinal = "std"
 
 def print_parametros():
 	global S_0, omega, T, dt, n_pontos
@@ -18,11 +22,80 @@ def print_parametros():
 	print(f"\t(1) S_0 = {S_0}\t(3) omega = {omega}\t(5) n_pontos = {n_pontos}")
 	print(f"\t(2) T = {T}\t(4) dt = {dt}\t")
 
-def menu_muda_parametro():
-	global S_0, omega, T, dt, n_pontos
+def menu_muda_sinal():
+	global S_0, omega, T, dt, n_pontos, tempos, sinal, nome_sinal
 
 	def print_menu():
-		print("Você escolheu mudar os parâmetros do sinal.")
+		print("Você escolheu mudar o formato do sinal.")
+
+		print("\nEscolha  sua opção: ")
+		print("\tL: Lista todos os sinais acessíveis ao programa.\tA: Altera o sinal atual.")
+		print("\tS: Salva o sinal atual em um arquivo.\t\t\tM: Mostra este menu novamente.")
+		print("\tD: Deleta um sinal salvo.\t\t\t\tF: Muda o foco para outro sinal.")
+		print("\tN: Cria um novo sinal.\t\t\t\t\tX: Sair deste menu.")
+
+	print_menu()
+	'''
+	while True:
+		escolha = str(input("\nDigite sua escolha: ")).capitalize()
+		print("\n")
+		
+		if escolha == "L":
+			print("Você escolheu listar os sinais salvos.\n")
+
+			pasta = Path('Sinais')
+
+			for arquivo in pasta.iterdir():
+				nome_arq = arquivo.name[:-4:]
+				if nome_sinal == nome_arq:
+					print(f"--> {nome_arq} <--")
+				else:
+					print(f"{nome_arq}")
+
+		elif escolha == "S":
+			print("Você escolheu salvar o sinal em um arquivo.")
+			nome_sinal = input("Digite o nome que deseja dar a este sinal: ")
+
+			if nome_sinal == "std":
+				print("Esse é o sinal padrão, e não pode ser alterado.")
+				continue
+
+			with open(f"Sinais\{nome_sinal}.txt", "w") as arquivo_sinal:
+				arquivo_sinal.write(str(n_pontos) + "\n")
+				arquivo_sinal.write(" ".join([str(i) for i in sinal]) + "\n")
+				arquivo_sinal.write(" ".join([str(i) for i in tempos]) + "\n")
+			
+			print("\nO sinal foi salvo com sucesso.")
+		
+		elif escolha == "D":
+			print("Você escolheu apagar um sinal.\n")
+			nome_sinal = input("Digite o nome do sinal que deseja excluir: ")
+
+			if nome_sinal == "std":
+				print("Esse é o sinal padrão, e não pode ser excluído.")
+				continue
+
+			caminho = Path(f'Sinais/{nome_sinal}.txt')
+			if caminho.exists():
+				caminho.unlink()
+				print("O sinal foi apagado.")
+			else:
+				print("Não existe nenhum sinal com esse nome.")
+
+		elif escolha == "X":
+			print("Você escolheu sair deste menu.")
+			print("Tem certeza? (y/n)")
+
+			escolha2 = str(input()).capitalize()
+
+			if escolha2 == "N":
+				continue
+			elif escolha2 == "Y":
+				break
+	'''
+	print("\n")
+	def print_menu():
+		print("Você escolheu modificar os sinais.")
 		
 		print_parametros()
 
@@ -37,35 +110,40 @@ def menu_muda_parametro():
 		escolha = str(input("\nDigite sua escolha: ")).capitalize()
 		print("\n")
 
-		if escolha == "1":
-			print("Você escolheu mudar S_0.")
-			S_0 = float(input("Digite o novo valor de S_0: "))
-			print("\n")
-			print_parametros()
+		if escolha in "12345":
 
-		elif escolha == "2":
-			print("\nVocê escolheu mudar T.")
-			T = float(input("Digite o novo valor de T: "))
-			print("\n")
-			print_parametros()
-			
-		elif escolha == "3":
-			print("Você escolheu mudar omega.")
-			omega = float(input("Digite o novo valor de omega: "))
-			print("\n")
-			print_parametros()
-			
-		elif escolha == "4":
-			print("Você escolheu mudar dt.")
-			dt = float(input("Digite o novo valor de dt: "))
-			print("\n")
-			print_parametros()
-			
-		elif escolha == "5":
-			print("Você escolheu mudar n_pontos.")
-			n_pontos = int(input("Digite o novo valor de n_pontos: "))
-			print("\n")
-			print_parametros()
+			if escolha == "1":
+				print("Você escolheu mudar S_0.")
+				S_0 = float(input("Digite o novo valor de S_0: "))
+				print("\n")
+				print_parametros()
+
+			elif escolha == "2":
+				print("\nVocê escolheu mudar T.")
+				T = float(input("Digite o novo valor de T: "))
+				print("\n")
+				print_parametros()
+				
+			elif escolha == "3":
+				print("Você escolheu mudar omega.")
+				omega = float(input("Digite o novo valor de omega: "))
+				print("\n")
+				print_parametros()
+				
+			elif escolha == "4":
+				print("Você escolheu mudar dt.")
+				dt = float(input("Digite o novo valor de dt: "))
+				print("\n")
+				print_parametros()
+				
+			elif escolha == "5":
+				print("Você escolheu mudar n_pontos.")
+				n_pontos = int(input("Digite o novo valor de n_pontos: "))
+				print("\n")
+				print_parametros()
+
+			tempos = ul.cria_array_tempos(dt, n_pontos) 
+			sinal = ul.simula_sinal(tempos, omega, T, S_0)
 				
 		elif escolha == "H":
 			print("Estes parâmetros controlam o comportamento do sinal simulado.")
@@ -97,14 +175,29 @@ def menu_muda_parametro():
 				continue
 			elif escolha2 == "Y":
 				break
+		
+		elif escolha == "F":
+			print("Você escolheu focar em outro sinal.\n")
+			nome_sinal = input("Digite o nome do sinal que deseja analisar: ")
+
+			if nome_sinal == "std":
+				print("Esse é o sinal padrão, e não pode ser excluído.")
+				continue
+
+			caminho = Path(f'Sinais/{nome_sinal}.txt')
+			if caminho.exists():
+				caminho.unlink()
+				print("O sinal foi apagado.")
+			else:
+				print("Não existe nenhum sinal com esse nome.")
 
 def menu():
-	global S_0, omega, T, dt, n_pontos
+	global S_0, omega, T, dt, n_pontos, tempos, sinal, nome_sinal
 
 	def print_menu():
 		print("Bem-vindo à resolução do Problema 1!") 
 		print("Escolha sua opção: ")
-		print("\tS: Mostra o sinal gerado.\tP: Modifica os parâmetros do sinal.")
+		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
 		print("\tF: Mostra a FT do sinal.")
 		print("\tM: Mostra este menu novamente.\tX: Termina o programa.")
 
@@ -115,19 +208,15 @@ def menu():
 		print("\n")
 
 		if escolha == "S":
-			tempos = ul.cria_array_tempos(dt, n_pontos)
-			sinal = ul.simula_sinal(tempos, omega, T, S_0)
 			ul.mostra_sinal(tempos, sinal)
 
 		elif escolha == "P":
 			print("\n")
-			menu_muda_parametro()
+			menu_muda_sinal()
 			print("\n")
 			print_menu()
 		
 		elif escolha == "F":
-			tempos = ul.cria_array_tempos(dt, n_pontos)
-			sinal = ul.simula_sinal(tempos, omega, T, S_0)
 			ft = ul.aplica_FFT_em_sinal(sinal)
 			frequencias = ul.cria_array_frequencias(n_pontos, dt)
 			ul.mostra_FT(frequencias, ft)
