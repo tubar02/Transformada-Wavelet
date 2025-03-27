@@ -169,7 +169,7 @@ def menu_muda_sinal():
 			escolha2 = "Y"
 			while escolha2 == "Y":
 				print("\n")
-				sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
+				sinal, tempos = ul.le_arquivo_sinal(nome_sinal) #arrumar?
 				sinal_novo, tempos_novo = menu_cria_sinal()
 				sinal += sinal_novo
 				assert np.array_equal(tempos, tempos_novo)
@@ -235,6 +235,8 @@ def menu_muda_sinal():
 			caminho = Path(f'Sinais/{nome_foca}.txt')
 			if caminho.exists() and salvou:
 				nome_sinal = nome_foca
+				sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
+				print(f"Depois de receber o o nome pelo usuário, foquei no sinal {nome_sinal}")
 				print("\nO foco foi alterado.")
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
