@@ -1,6 +1,7 @@
 import useful_lib as ul
 import numpy as np
 from pathlib import Path
+from math import pi
 
 nome_sinal = "std"
 
@@ -8,11 +9,11 @@ def menu_adiciona(sinal, tempos):
 	def print_menu():
 		print(f"Você escolheu adicionar um sinal ao sinal {nome_sinal}.")
 		print("Como você deseja realizar a soma?\n")
-		print("\tE: Soma os sinais atualmente salvos.\tN: Soma sinais novos.\n")
-		print("\tX: Sair.")
+		print("\tE: Soma os sinais atualmente salvos.\tN: Soma sinais novos.")
+		print("\tM: Mostra esse menu novamente.\tX: Sair.")
 
 	print_menu()
-
+	salvou = True
 	while True:
 		escolha = str(input("\nDigite sua escolha: ")).capitalize()
 		print("\n")
@@ -20,16 +21,21 @@ def menu_adiciona(sinal, tempos):
 		if escolha == "E":
 			escolha2 = "Y"
 			while escolha2 == "Y":
-				print("Você escolheu adicionar sinais existentes.")
+				print("\nVocê escolheu adicionar sinais existentes.")
 				nome_adiciona = input(f"Entre com o nome do sinal que deseja somar a {nome_sinal}: ")
+				print("\n")
 
 				caminho = Path(f'Sinais/{nome_adiciona}.txt')
 				if caminho.exists():
 					sinal_novo, tempos_novo = ul.le_arquivo_sinal(nome_adiciona)
+					salvou = False
 				else:
 					print("Esse sinal não existe. Tente novamente.\n")
 					print_menu()
 					continue
+
+				sinal += sinal_novo
+				assert np.array_equal(tempos, tempos_novo)	
 
 				print("Deseja realizar uma nova soma? (y/n)")
 				escolha2 = str(input()).capitalize()
@@ -41,12 +47,20 @@ def menu_adiciona(sinal, tempos):
 			escolha2 = "Y"
 			while escolha2 == "Y":
 				sinal_novo, tempos_novo = menu_cria_sinal()
+				salvou = False
+
+				sinal += sinal_novo
+				assert np.array_equal(tempos, tempos_novo)	
 
 				print("Deseja realizar uma nova soma? (y/n)")
 				escolha2 = str(input()).capitalize()
 				while escolha2 not in "YN":
 					print("Por favor, digite somente \"y\" ou \"n\".")
 					escolha2 = str(input()).capitalize()
+
+		elif escolha == "M":
+			print("\n")
+			print_menu()
 
 		elif escolha == "X":
 			print("Você escolheu sair deste menu.")
@@ -60,11 +74,7 @@ def menu_adiciona(sinal, tempos):
 			if escolha2 == "N":
 				continue
 			elif escolha2 == "Y":
-				break
-		
-		sinal += sinal_novo
-		assert np.array_equal(tempos, tempos_novo)	
-		return sinal, tempos
+				return sinal, tempos, salvou
 
 def menu_cria_sinal(opcao_N = False):
 	global nome_sinal
@@ -128,7 +138,8 @@ def menu_cria_sinal(opcao_N = False):
 				
 			elif escolha == "3":
 				print("Você escolheu mudar omega.")
-				omega = float(input("Digite o novo valor de omega: "))
+				print("Entre com a frequência em Hz, que esta será automaticamente convertida em rad/s.")
+				omega = float(input("Digite o novo valor de omega: ")) * (2 * pi)
 				print("\n")
 				print_parametros()
 				
@@ -232,8 +243,7 @@ def menu_muda_sinal():
 					print(f"{nome_arq}")
 		
 		elif escolha == "A":
-			sinal, tempos = menu_adiciona(sinal, tempos)
-			salvou = False
+			sinal, tempos, salvou = menu_adiciona(sinal, tempos)
 			print_menu()
 
 		elif escolha == "S":
@@ -299,6 +309,7 @@ def menu_muda_sinal():
 					continue
 				elif escolha2 == "Y":
 					nome_sinal = nome_foca
+					salvou = True
 					print("O foco foi alterado.")
 			else:
 				print("\nNão existe nenhum sinal com esse nome.")
