@@ -293,7 +293,14 @@ def menu():
 		print("\n")
 
 		if escolha == "S":
-			ul.mostra_sinal(tempos, sinal)
+			print("Você escolheu ver o gráfico do sinal no domínio do tempo.")
+			print("Como você deseja visualizar seu sinal?\n")
+			print("\tr: Componente real.\ti: Componente imaginária.")
+			print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+
+			escolha = input("Entre com sua escolha: ").lower()
+
+			ul.mostra_sinal(tempos, sinal, escolha)
 
 		elif escolha == "P":
 			print("\n")
@@ -302,9 +309,16 @@ def menu():
 			print_menu()
 		
 		elif escolha == "F":
+			print("Você escolheu ver o gráfico do sinal no domínio da frequência.")
+			print("Como você deseja visualizar seu sinal transformado?\n")
+			print("\tr: Componente real.\ti: Componente imaginária.")
+			print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+
+			escolha = input("Entre com sua escolha: ").lower()
+
 			ft = ul.aplica_FFT_em_sinal(sinal)
 			frequencias = ul.cria_array_frequencias(tempos)
-			ul.mostra_FT(frequencias, ft)
+			ul.mostra_FT(frequencias, ft, escolha)
 
 		elif escolha == "M":
 			print("\n")

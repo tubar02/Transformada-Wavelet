@@ -30,11 +30,16 @@ def simula_sinal(array_tempos, omega_0 = omega, T_0 = T, S_0 = S_0):
 	sinal = S_0 * np.exp(-array_tempos/T_0) * np.exp(1j * omega_0 * array_tempos) #cria o vetor com o sinal simulado
 	return sinal
 
-def mostra_sinal(tempo, sinal, separa_componentes = True):
-	if separa_componentes: 
+def mostra_sinal(tempo, sinal, componente):
+	assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
+	if componente == "r": 
+		plt.plot(tempo, sinal.real, label="Parte real")
+	elif componente == "i":
+		plt.plot(tempo, sinal.imag, label="Parte imaginária")
+	elif componente == "ri":
 		plt.plot(tempo, sinal.real, label="Parte real")
 		plt.plot(tempo, sinal.imag, label="Parte imaginária")
-	else:
+	elif componente == "m":
 		plt.plot(tempo, np.abs(sinal), label="Módulo")
 		
 	plt.xlabel("Tempo (s)")
@@ -52,15 +57,22 @@ def cria_array_frequencias(tempos):
 	dt = tempos[1] - tempos[0]
 	return np.fft.fftfreq(n_pontos, dt)
 
-def mostra_FT(frequencia, ft, separa_componentes = False):
-	if separa_componentes:
+def mostra_FT(frequencia, ft, componente):
+	assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
+	if componente == "r": 
+		plt.plot(frequencia, ft.real, label="Parte real")
+	elif componente == "i":
+		plt.plot(frequencia, ft.imag, label="Parte imaginária")
+	elif componente == "ri":
 		plt.plot(frequencia, ft.real, label="Parte real")
 		plt.plot(frequencia, ft.imag, label="Parte imaginária")
-	else:
-		plt.plot(frequencia, np.abs(ft))
+	elif componente == "m":
+		plt.plot(frequencia, np.abs(ft), label="Módulo")
+
 	plt.xlabel('Frequência (Hz)')
-	plt.ylabel('Magnitude')
+	plt.ylabel('FT do Sinal')
 	plt.title('Espectro de Frequência do Sinal')
+	plt.legend()
 	plt.grid()
 	plt.show()
 
