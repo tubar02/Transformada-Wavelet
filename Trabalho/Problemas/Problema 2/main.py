@@ -4,6 +4,68 @@ from pathlib import Path
 
 nome_sinal = "std"
 
+def menu_adiciona(sinal, tempos):
+	def print_menu():
+		print(f"Você escolheu adicionar um sinal ao sinal {nome_sinal}.")
+		print("Como você deseja realizar a soma?\n")
+		print("\tE: Soma os sinais atualmente salvos.\tN: Soma sinais novos.\n")
+		print("\tX: Sair.")
+
+	print_menu()
+
+	while True:
+		escolha = str(input("\nDigite sua escolha: ")).capitalize()
+		print("\n")
+
+		if escolha == "E":
+			escolha2 = "Y"
+			while escolha2 == "Y":
+				print("Você escolheu adicionar sinais existentes.")
+				nome_adiciona = input(f"Entre com o nome do sinal que deseja somar a {nome_sinal}: ")
+
+				caminho = Path(f'Sinais/{nome_adiciona}.txt')
+				if caminho.exists():
+					sinal_novo, tempos_novo = ul.le_arquivo_sinal(nome_adiciona)
+				else:
+					print("Esse sinal não existe. Tente novamente.\n")
+					print_menu()
+					continue
+
+				print("Deseja realizar uma nova soma? (y/n)")
+				escolha2 = str(input()).capitalize()
+				while escolha2 not in "YN":
+					print("Por favor, digite somente \"y\" ou \"n\".")
+					escolha2 = str(input()).capitalize()
+		
+		elif escolha == "N":
+			escolha2 = "Y"
+			while escolha2 == "Y":
+				sinal_novo, tempos_novo = menu_cria_sinal()
+
+				print("Deseja realizar uma nova soma? (y/n)")
+				escolha2 = str(input()).capitalize()
+				while escolha2 not in "YN":
+					print("Por favor, digite somente \"y\" ou \"n\".")
+					escolha2 = str(input()).capitalize()
+
+		elif escolha == "X":
+			print("Você escolheu sair deste menu.")
+			print("Tem certeza? (y/n)")
+
+			escolha2 = str(input()).capitalize()
+			while escolha2 not in "YN":
+					print("Por favor, digite somente \"y\" ou \"n\".")
+					escolha2 = str(input()).capitalize()
+
+			if escolha2 == "N":
+				continue
+			elif escolha2 == "Y":
+				break
+		
+		sinal += sinal_novo
+		assert np.array_equal(tempos, tempos_novo)	
+		return sinal, tempos
+
 def menu_cria_sinal(opcao_N = False):
 	global nome_sinal
 
@@ -135,7 +197,10 @@ def menu_cria_sinal(opcao_N = False):
 def menu_muda_sinal():
 	global nome_sinal
 
+	salvou = True
 	def print_menu():
+		nonlocal salvou
+
 		print("Você escolheu mudar o formato do sinal.")
 
 		print("\nEscolha  sua opção: ")
@@ -144,11 +209,12 @@ def menu_muda_sinal():
 		print("\tD: Deleta um sinal salvo.\t\t\t\tF: Muda o foco para outro sinal.")
 		print("\tM: Mostra este menu novamente.\t\t\t\tX: Sair deste menu.")
 		print("Foco: ", nome_sinal)
+		if not salvou:
+			print("Você possui alterações não salvas!")
 
 	print_menu()
 	
 	sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
-	salvou = True
 	while True:
 		escolha = str(input("\nDigite sua escolha: ")).capitalize()
 		print("\n")
@@ -166,21 +232,9 @@ def menu_muda_sinal():
 					print(f"{nome_arq}")
 		
 		elif escolha == "A":
-			escolha2 = "Y"
-			while escolha2 == "Y":
-				print("\n")
-				sinal, tempos = ul.le_arquivo_sinal(nome_sinal) #arrumar?
-				sinal_novo, tempos_novo = menu_cria_sinal()
-				sinal += sinal_novo
-				assert np.array_equal(tempos, tempos_novo)
-				print("\n")
-				print("Deseja realizar uma nova soma? (y/n)")
-				escolha2 = str(input()).capitalize()
-				while escolha2 not in "YN":
-					print("Por favor, digite somente \"y\" ou \"n\".")
-					escolha2 = str(input()).capitalize()
-			print_menu()
+			sinal, tempos = menu_adiciona(sinal, tempos)
 			salvou = False
+			print_menu()
 
 		elif escolha == "S":
 			print("Você escolheu salvar o sinal em um arquivo.\n")
@@ -236,7 +290,6 @@ def menu_muda_sinal():
 			if caminho.exists() and salvou:
 				nome_sinal = nome_foca
 				sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
-				print(f"Depois de receber o o nome pelo usuário, foquei no sinal {nome_sinal}")
 				print("\nO foco foi alterado.")
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
