@@ -58,6 +58,7 @@ def cria_array_frequencias(tempos):
 	return np.fft.fftfreq(n_pontos, dt)
 
 def mostra_FT(frequencia, ft, componente):
+	ft, frequencia = np.fft.fftshift(ft), np.fft.fftshift(frequencia) #realiza o shift
 	assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
 	if componente == "r": 
 		plt.plot(frequencia, ft.real, label="Parte real")
