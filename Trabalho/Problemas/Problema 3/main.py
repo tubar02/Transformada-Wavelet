@@ -382,7 +382,7 @@ def menu():
 
 			escolha = input("Entre com sua escolha: ").lower()
 
-			ul.mostra_sinal(tempos, sinal, escolha)
+			ul.mostra_sinal(sinal, tempos, escolha)
 
 		elif escolha == "P":
 			print("\n")
@@ -400,7 +400,7 @@ def menu():
 
 			ft = ul.aplica_FFT_em_sinal(sinal)
 			frequencias = ul.cria_array_frequencias(tempos)
-			ul.mostra_FT(frequencias, ft, escolha)
+			ul.mostra_FT(ft, frequencias, escolha)
 
 		elif escolha == "M":
 			print("\n")
