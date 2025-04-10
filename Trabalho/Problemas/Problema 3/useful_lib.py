@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 #inicialização dos dados
 with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros dados
@@ -58,6 +59,7 @@ def cria_array_frequencias(tempos):
 	return np.fft.fftfreq(n_pontos, dt)
 
 def mostra_FT(frequencia, ft, componente):
+	ft, frequencia = np.fft.fftshift(ft), np.fft.fftshift(frequencia) #realiza o shift
 	assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
 	if componente == "r": 
 		plt.plot(frequencia, ft.real, label="Parte real")
@@ -76,21 +78,32 @@ def mostra_FT(frequencia, ft, componente):
 	plt.grid()
 	plt.show()
 
+def adiciona_ruido_gauss(_sinal, mu, sigma):
+	sinal = deepcopy(_sinal)
+
+	ruido1 = np.random.normal(mu, sigma, len(sinal))
+	ruido2 = np.random.normal(mu, sigma, len(sinal)) * 1j
+	return sinal + ruido1 + ruido2
+
 def main():
 	tempo = cria_array_tempos(0.0005, 2048)
 	sinal = simula_sinal(tempo, 628)
 
-	mostra_sinal(tempo, sinal)
+	mostra_sinal(tempo, sinal, "r")
 
 	fft_sinal = np.fft.fft(sinal)
 	frequencias = np.fft.fftfreq(n_pontos, dt)
 
-	plt.plot(frequencias, np.abs(fft_sinal))
-	plt.xlabel('Frequência (Hz)')
-	plt.ylabel('Magnitude')
-	plt.title('Espectro de Frequência do Sinal')
-	plt.grid()
-	plt.show()
+	mostra_FT(frequencias, fft_sinal, "m")
+
+	sinal_ruidoso = adiciona_ruido_gauss(sinal, 0, 0.05)
+
+	mostra_sinal(tempo, sinal_ruidoso, "r")
+	mostra_sinal(tempo, sinal_ruidoso, "i")
+
+	fft_sinal_ruidoso = np.fft.fft(sinal_ruidoso)
+
+	mostra_FT(frequencias, fft_sinal_ruidoso, "m")
 
 	return 0
 

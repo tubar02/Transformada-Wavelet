@@ -218,6 +218,7 @@ def menu_muda_sinal():
 		print("\tL: Lista todos os sinais acessíveis ao programa.\tA: Soma um sinal ao sinal com foco atual.")
 		print("\tS: Salva o sinal atual em um arquivo.\t\t\tN: Cria um novo sinal.")
 		print("\tD: Deleta um sinal salvo.\t\t\t\tF: Muda o foco para outro sinal.")
+		print("\tR: Adiciona ruído gaussiano a um sinal.")
 		print("\tM: Mostra este menu novamente.\t\t\t\tX: Sair deste menu.")
 		print("Foco: ", nome_sinal)
 		if not salvou:
@@ -313,6 +314,23 @@ def menu_muda_sinal():
 					print("O foco foi alterado.")
 			else:
 				print("\nNão existe nenhum sinal com esse nome.")
+
+		elif escolha == "R":
+			print("Você escolheu adicionar ruído gaussiano a um sinal.")
+			print("O ruído gaussiano é gerado a partir de uma função de densidade de probabilidade, definida como: ")
+			print("\n\tP(x) = 1/(sigma * sqrt(2 * pi)) * exp(-((x - mu)^2)/(2 * sigma^2))")
+			print("\nOnde mu indica a média, e sigma o desvio padrão.")
+
+			mu = float(input("\nEntre com o valor de mu: "))
+			sigma = float(input("Entre com o valor de sigma: "))
+
+			sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma)
+			
+			print("\nSinal ruidoso criado.")
+			nome_salva = input("Entre com um nome para dar ao sinal ruidoso: ")
+
+			ul.salva_sinal(sinal_ruidoso, tempos, nome_salva)
+			print("O sinal foi salvo.")
 
 		elif escolha == "M":
 			print("\n")
