@@ -217,7 +217,7 @@ def menu_muda_sinal():
 
 		print("\nEscolha  sua opção: ")
 		print("\tL: Lista todos os sinais acessíveis ao programa.\tA: Soma um sinal ao sinal com foco atual.")
-		print("\tS: Salva o sinal atual em um arquivo.\t\t\tN: Cria um novo sinal.")
+		print("\tS: Salva o sinal atual em um arquivo.\t\t\tN: Cria um novo sinal unidimensional.")
 		print("\tD: Deleta um sinal salvo.\t\t\t\tF: Muda o foco para outro sinal.")
 		print("\tR: Adiciona ruído gaussiano a um sinal.")
 		print("\tM: Mostra este menu novamente.\t\t\t\tX: Sair deste menu.")
@@ -259,7 +259,7 @@ def menu_muda_sinal():
 		elif escolha == "A" and isImage:
 			print("Opção não válida para imagens.")
 
-		elif escolha == "S":
+		elif escolha == "S" and not isImage:
 			print("Você escolheu salvar o sinal em um arquivo.\n")
 			nome_sinal = input("Digite o nome que deseja dar a este sinal: ")
 
@@ -279,6 +279,8 @@ def menu_muda_sinal():
 			
 			print("\nO sinal foi salvo com sucesso.")
 			salvou = True
+		elif escolha == "S" and isImage:
+			print("Opção não válida para imagens.")
 		
 		elif escolha == "N":
 			print("\n")
@@ -290,20 +292,34 @@ def menu_muda_sinal():
 			print("Você escolheu apagar um sinal.\n")
 			nome_apaga = input("Digite o nome do sinal que deseja excluir: ")
 
+			caminho1 = Path(f'Sinais/{nome_apaga}.txt')
+			caminho2 = Path(f'Imagens/{nome_apaga}.pgm')
+
+			if caminho1.exists() and caminho2.exists():
+				print("O seu sinal é uma imagem? (y/n)")
+				aux = input().capitalize()
+				if aux == "Y":
+					caminho = caminho2
+				else:
+					caminho = caminho1
+			elif caminho1.exists():
+				caminho = caminho1
+			elif caminho2.exists():
+				caminho = caminho2
+			else:
+				print("\nNão existe nenhum sinal com esse nome.")
+				continue
+
 			if nome_apaga == "std":
 				print("Esse é o sinal padrão, e não pode ser excluído.")
 				continue
 
-			caminho = Path(f'Sinais/{nome_apaga}.txt')
-			if caminho.exists():
-				caminho.unlink()
-				print("\nO sinal foi apagado.")
+			caminho.unlink()
+			print("\nO sinal foi apagado.")
 
-				if nome_apaga == nome_sinal:
-					nome_sinal = "std"
+			if nome_apaga == nome_sinal:
+				nome_sinal = "std"
 
-			else:
-				print("\nNão existe nenhum sinal com esse nome.")
 			
 		elif escolha == "F":
 			print("Você escolheu focar em outro sinal.\n")
@@ -348,14 +364,15 @@ def menu_muda_sinal():
 
 			mu = float(input("\nEntre com o valor de mu: "))
 			sigma = float(input("Entre com o valor de sigma: "))
-
-			sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma)
-			
-			print("\nSinal ruidoso criado.")
 			nome_salva = input("Entre com um nome para dar ao sinal ruidoso: ")
 
-			ul.salva_sinal(sinal_ruidoso, tempos, nome_salva)
-			print("O sinal foi salvo.")
+			if isImage:
+				sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma, True, f"Imagens\\{nome_salva}.pgm")
+			else:
+				sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma)
+				ul.salva_sinal(sinal_ruidoso, tempos, nome_salva)
+			
+			print("\nSinal ruidoso criado.")
 
 		elif escolha == "M":
 			print("\n")
