@@ -253,9 +253,11 @@ def menu_muda_sinal():
 				else:
 					print(f"\t{nome_arq}")
 		
-		elif escolha == "A":
+		elif escolha == "A" and not isImage:
 			sinal, tempos, salvou = menu_adiciona(sinal, tempos)
 			print_menu()
+		elif escolha == "A" and isImage:
+			print("Opção não válida para imagens.")
 
 		elif escolha == "S":
 			print("Você escolheu salvar o sinal em um arquivo.\n")
@@ -424,16 +426,22 @@ def menu():
 			print_menu()
 		
 		elif escolha == "F":
-			print("Você escolheu ver o gráfico do sinal no domínio da frequência.")
-			print("Como você deseja visualizar seu sinal transformado?\n")
-			print("\tr: Componente real.\ti: Componente imaginária.")
-			print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+			print("Você escolheu ver o sinal no domínio da frequência.")
 
-			escolha = input("Entre com sua escolha: ").lower()
+			if isImage:
+				ft = ul.aplica_FFT_em_sinal(sinal, True)
+				ul.mostra_FT(ft, isImage=True)
+			
+			else:
+				print("Como você deseja visualizar seu sinal transformado?\n")
+				print("\tr: Componente real.\ti: Componente imaginária.")
+				print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
 
-			ft = ul.aplica_FFT_em_sinal(sinal)
-			frequencias = ul.cria_array_frequencias(tempos)
-			ul.mostra_FT(ft, frequencias, escolha)
+				escolha = input("Entre com sua escolha: ").lower()
+
+				ft = ul.aplica_FFT_em_sinal(sinal)
+				frequencias = ul.cria_array_frequencias(tempos)
+				ul.mostra_FT(ft, frequencias, escolha)
 
 		elif escolha == "M":
 			print("\n")
