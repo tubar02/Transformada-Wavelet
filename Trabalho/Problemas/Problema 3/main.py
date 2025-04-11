@@ -4,6 +4,7 @@ from pathlib import Path
 from math import pi
 
 nome_sinal = "std"
+isImage = False
 
 def menu_adiciona(sinal, tempos):
 	def print_menu():
@@ -206,7 +207,7 @@ def menu_cria_sinal(opcao_N = False):
 					return sinal, tempos
 
 def menu_muda_sinal():
-	global nome_sinal
+	global nome_sinal, isImage
 
 	salvou = True
 	def print_menu():
@@ -226,7 +227,7 @@ def menu_muda_sinal():
 
 	print_menu()
 	
-	sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
+	#sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
 	while True:
 		escolha = str(input("\nDigite sua escolha: ")).capitalize()
 		print("\n")
@@ -235,13 +236,22 @@ def menu_muda_sinal():
 			print("Você escolheu listar os sinais salvos.\n")
 
 			pasta = Path('Sinais')
-
+			print(pasta)
 			for arquivo in pasta.iterdir():
 				nome_arq = arquivo.name[:-4:]
-				if nome_sinal == nome_arq:
-					print(f"--> {nome_arq} <--")
+				if nome_sinal == nome_arq and not isImage:
+					print(f"\t--> {nome_arq} <--")
 				else:
-					print(f"{nome_arq}")
+					print(f"\t{nome_arq}")
+
+			pasta = Path('Imagens')
+			print(pasta)
+			for arquivo in pasta.iterdir():
+				nome_arq = arquivo.name[:-4:]
+				if nome_sinal == nome_arq and isImage:
+					print(f"\t--> {nome_arq} <--")
+				else:
+					print(f"\t{nome_arq}")
 		
 		elif escolha == "A":
 			sinal, tempos, salvou = menu_adiciona(sinal, tempos)
@@ -295,12 +305,25 @@ def menu_muda_sinal():
 			
 		elif escolha == "F":
 			print("Você escolheu focar em outro sinal.\n")
-			nome_foca = input("Digite o nome do sinal que deseja analisar: ")
 
-			caminho = Path(f'Sinais/{nome_foca}.txt')
+			print("Seu sinal é uma imagem? (y/n)")
+			isImage = input().capitalize()
+
+			nome_foca = input("\nDigite o nome do sinal que deseja analisar: ")
+
+			if isImage == "Y":
+				isImage = True
+				caminho = Path(f'Imagens/{nome_foca}.pgm')
+			else:
+				isImage = False
+				caminho = Path(f'Sinais/{nome_foca}.txt')
+
 			if caminho.exists() and salvou:
 				nome_sinal = nome_foca
-				sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
+				if isImage:
+					sinal = ul.le_arquivo_sinal(caminho, True)
+				else:
+					sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
 				print("\nO foco foi alterado.")
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
@@ -345,7 +368,10 @@ def menu_muda_sinal():
 			if escolha2 == "N":
 				continue
 			elif escolha2 == "Y" and salvou:
-				return sinal, tempos
+				if isImage:
+					return sinal, None
+				else:
+					return sinal, tempos
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
 				escolha3 = str(input()).capitalize()
@@ -353,7 +379,10 @@ def menu_muda_sinal():
 				if escolha3 == "N":
 					continue
 				elif escolha3 == "Y":
-					return sinal, tempos
+					if isImage:
+						return sinal, None
+					else:
+						return sinal, tempos
 
 def menu():
 	global nome_sinal
@@ -376,13 +405,17 @@ def menu():
 
 		if escolha == "S":
 			print("Você escolheu ver o gráfico do sinal no domínio do tempo.")
-			print("Como você deseja visualizar seu sinal?\n")
-			print("\tr: Componente real.\ti: Componente imaginária.")
-			print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
 
-			escolha = input("Entre com sua escolha: ").lower()
+			if isImage:
+				ul.mostra_sinal(sinal, isImage=True)
+			else:
+				print("Como você deseja visualizar seu sinal?\n")
+				print("\tr: Componente real.\ti: Componente imaginária.")
+				print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
 
-			ul.mostra_sinal(sinal, tempos, escolha)
+				escolha = input("Entre com sua escolha: ").lower()
+
+				ul.mostra_sinal(sinal, tempos, escolha)
 
 		elif escolha == "P":
 			print("\n")

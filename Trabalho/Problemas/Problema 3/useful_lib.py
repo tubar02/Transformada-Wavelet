@@ -13,7 +13,7 @@ with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros
 
 def le_arquivo_sinal(nome_arq, isImage = False):
 	if isImage:
-		sinal = mil.Image(f"Imagens/{nome_arq}")
+		sinal = mil.Image(f"{nome_arq}")
 		return sinal
 
 	else:
