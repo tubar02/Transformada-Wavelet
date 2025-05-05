@@ -660,13 +660,13 @@ def kernel_gaussiano(desvio_padrao, k):
 
 #funções de plot
 def print_image(imagem): #Plota a imagem em cor
-    img = mpimg.imread(imagem._local)
+    img = imagem.pixels
     plt.imshow(img)
     plt.axis('off')  # Para desativar os eixos
     plt.show()
 
 def print_grayscale_image(imagem): #Plota a imagem em escala de cinza
-	img = mpimg.imread(imagem._local)
+	img = imagem.pixels
     
     # Exibir a imagem em tons de cinza
 	plt.imshow(img, cmap='gray', vmin=0, vmax=255)

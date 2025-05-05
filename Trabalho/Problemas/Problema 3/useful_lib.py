@@ -11,13 +11,13 @@ with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros
 	dt = float(valores_iniciais.readline().split()[2])
 	n_pontos = int(valores_iniciais.readline().split()[2])
 
-def le_arquivo_sinal(nome_arq, isImage = False):
+def le_arquivo_sinal(caminho_arq, isImage = False):
 	if isImage:
-		sinal = mil.Image(f"{nome_arq}")
+		sinal = mil.Image(f"{caminho_arq}")
 		return sinal
 
 	else:
-		with open(f"Sinais/{nome_arq}.txt", "r") as arquivo_sinal:
+		with open(f"{caminho_arq}", "r") as arquivo_sinal:
 			n_pontos = arquivo_sinal.readline()
 			sinal = np.array([complex(i) for i in arquivo_sinal.readline().split()])
 			tempos = np.array([float(i) for i in arquivo_sinal.readline().split()])
@@ -110,7 +110,7 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def main():
-	sinal = le_arquivo_sinal("gourds.pgm", True)
+	sinal = le_arquivo_sinal("Imagens/gourds.pgm", True)
 
 	mostra_sinal(sinal, isImage=True)
 
@@ -119,7 +119,7 @@ def main():
 	mostra_FT(sinal_FT, isImage=True)
 	
 	mu, sigma = 0, 25
-	sinal_ruidoso = adiciona_ruido_gauss(sinal, mu, sigma, True, f"Imagens\\gourdsGauss.pgm")
+	sinal_ruidoso = adiciona_ruido_gauss(sinal, mu, sigma, True, f"Imagens/gourdsGauss.pgm")
 
 	mostra_sinal(sinal_ruidoso, isImage=True)
 

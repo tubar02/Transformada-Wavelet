@@ -206,7 +206,7 @@ def menu_cria_sinal(opcao_N = False):
 					sinal = ul.simula_sinal(tempos, omega, T, S_0)
 					return sinal, tempos
 
-def menu_muda_sinal():
+def menu_muda_sinal(sinal):
 	global nome_sinal, isImage
 
 	salvou = True
@@ -227,7 +227,6 @@ def menu_muda_sinal():
 
 	print_menu()
 	
-	#sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
 	while True:
 		escolha = str(input("\nDigite sua escolha: ")).capitalize()
 		print("\n")
@@ -341,7 +340,7 @@ def menu_muda_sinal():
 				if isImage:
 					sinal = ul.le_arquivo_sinal(caminho, True)
 				else:
-					sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
+					sinal, tempos = ul.le_arquivo_sinal(caminho)
 				print("\nO foco foi alterado.")
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
@@ -367,7 +366,7 @@ def menu_muda_sinal():
 			nome_salva = input("Entre com um nome para dar ao sinal ruidoso: ")
 
 			if isImage:
-				sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma, True, f"Imagens\\{nome_salva}.pgm")
+				sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma, True, f"Imagens/{nome_salva}.pgm")
 			else:
 				sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma)
 				ul.salva_sinal(sinal_ruidoso, tempos, nome_salva)
@@ -406,7 +405,7 @@ def menu_muda_sinal():
 def menu():
 	global nome_sinal
 
-	sinal, tempos = ul.le_arquivo_sinal(nome_sinal)
+	sinal, tempos = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
 
 	def print_menu():
 		print("Bem-vindo à resolução do Problema 2!") 
@@ -438,7 +437,7 @@ def menu():
 
 		elif escolha == "P":
 			print("\n")
-			sinal, tempos = menu_muda_sinal()
+			sinal, tempos = menu_muda_sinal(sinal)
 			print("\n")
 			print_menu()
 		
