@@ -206,7 +206,7 @@ def menu_cria_sinal(opcao_N = False):
 					sinal = ul.simula_sinal(tempos, omega, T, S_0)
 					return sinal, tempos
 
-def menu_muda_sinal(sinal):
+def menu_muda_sinal(sinal, tempos):
 	global nome_sinal, isImage
 
 	salvou = True
@@ -408,7 +408,7 @@ def menu():
 	sinal, tempos = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
 
 	def print_menu():
-		print("Bem-vindo à resolução do Problema 2!") 
+		print("Bem-vindo à resolução do Problema 3!") 
 		print("Escolha sua opção: ")
 		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
 		print("\tF: Mostra a FT do sinal.")
@@ -437,7 +437,7 @@ def menu():
 
 		elif escolha == "P":
 			print("\n")
-			sinal, tempos = menu_muda_sinal(sinal)
+			sinal, tempos = menu_muda_sinal(sinal, tempos)
 			print("\n")
 			print_menu()
 		
