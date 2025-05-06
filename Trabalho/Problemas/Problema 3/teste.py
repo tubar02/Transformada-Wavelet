@@ -1,16 +1,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pywt
+import useful_lib as ul
 
-# Gerando valores aleatórios de ruído seguindo uma distribuição normal
-mu = 0       # Média do ruído
-sigma = 1    # Desvio padrão do ruído
-n_pontos = 10000  # Número de amostras
+w = pywt.Wavelet("db4")
 
-ruido = np.random.normal(mu, sigma, n_pontos)  # Gerando os valores
+sinal, tempos = ul.le_arquivo_sinal("Sinais/Exemplo.txt")
 
-plt.plot(ruido, linestyle='-', marker='.', markersize=3, color='b')
-plt.xlabel("Índice")
-plt.ylabel("Amplitude do Ruído")
-plt.title("Ruído Gaussiano")
-plt.grid()
-plt.show()
+coeficientes = pywt.wavedec(sinal, wavelet='db4', level=4)
+
+max_len = max(len(c) for c in coeficientes)
+coef_matrix = np.array([np.pad(c, (0, max_len - len(c))) for c in coeficientes])
+coef_matrix = np.abs(coef_matrix)
+
+plt.imshow(coef_matrix, aspect='auto', cmap='viridis', origin='lower')
+plt.colorbar(label='Amplitude')
+plt.xlabel('Posição no sinal')
+plt.ylabel('Níveis da DTWT')
+plt.title('Coeficientes da Transformada Wavelet (DTWT)')
+plt.savefig("Del/wavelet.png")
+
+#ul.mostra_sinal(sinal, tempos, "r")
