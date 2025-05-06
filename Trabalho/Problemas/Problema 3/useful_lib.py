@@ -24,7 +24,7 @@ def le_arquivo_sinal(caminho_arq, isImage = False):
 		return sinal, tempos
 
 def salva_sinal(sinal, tempos, nome_sinal):
-	with open(f"Sinais\{nome_sinal}.txt", "w") as arquivo_sinal:
+	with open(f"Sinais/{nome_sinal}.txt", "w") as arquivo_sinal:
 		arquivo_sinal.write(str(len(sinal)) + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in sinal]) + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in tempos]) + "\n")
