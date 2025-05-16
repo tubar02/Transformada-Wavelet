@@ -3,21 +3,17 @@ import matplotlib.pyplot as plt
 import pywt
 import useful_lib as ul
 
-w = pywt.Wavelet("db4")
+sinal, tempos = ul.le_arquivo_sinal("Sinais/omega100.txt")
 
-sinal, tempos = ul.le_arquivo_sinal("Sinais/Exemplo.txt")
+ul.mostra_sinal(sinal, tempos, "r")
 
-coeficientes = pywt.wavedec(sinal, wavelet='db4', level=4)
+coeficientes = pywt.wavedec(sinal, wavelet='haar', level=4)
 
-max_len = max(len(c) for c in coeficientes)
-coef_matrix = np.array([np.pad(c, (0, max_len - len(c))) for c in coeficientes])
-coef_matrix = np.abs(coef_matrix)
+for i, c in enumerate(coeficientes):
+    plt.subplot(len(coeficientes), 1, len(coeficientes) - i)
+    plt.plot(c, label=f'Nível {len(coeficientes) - i}' if i > 0 else 'Aproximação')
+    plt.legend()
+    plt.grid(True)
 
-plt.imshow(coef_matrix, aspect='auto', cmap='viridis', origin='lower')
-plt.colorbar(label='Amplitude')
-plt.xlabel('Posição no sinal')
-plt.ylabel('Níveis da DTWT')
-plt.title('Coeficientes da Transformada Wavelet (DTWT)')
-plt.savefig("Del/wavelet.png")
-
-#ul.mostra_sinal(sinal, tempos, "r")
+plt.tight_layout()
+plt.show()
