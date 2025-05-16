@@ -1,0 +1,1 @@
+Tendo os códigos desenvolvidos para o problema anterior, implementar a transformada wavelet 1D e 2D.
