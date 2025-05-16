@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import my_image_lib_0_7 as mil
+import pywt
 from copy import deepcopy
 
 #inicialização dos dados
@@ -95,6 +96,26 @@ def mostra_FT(ft, frequencia = None, componente = None, isImage = False):
 		plt.legend()
 		plt.grid()
 		plt.show()
+	
+def aplica_DTWT_em_sinal(sinal, familia, nivel, isImage = False):
+	if isImage:
+		pass
+	else:
+		coeficientes = pywt.wavedec(sinal, wavelet=familia, level=nivel)
+		return coeficientes
+
+def mostra_WT(coeficientes, isImage = False):
+	if isImage:
+		pass
+	else:
+		for i, c in enumerate(coeficientes):
+			plt.subplot(len(coeficientes), 1, len(coeficientes) - i)
+			plt.plot(c, label=f'Nível {len(coeficientes) - i}' if i > 0 else 'Aproximação')
+			plt.legend()
+			plt.grid(True)
+
+		plt.tight_layout()
+		plt.show()
 
 def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 	if isImage:
@@ -110,22 +131,11 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def main():
-	sinal = le_arquivo_sinal("Imagens/gourds.pgm", True)
+	sinal, tempos = le_arquivo_sinal("Sinais/omega100.txt")
+	mostra_sinal(sinal, tempos, "r")
 
-	mostra_sinal(sinal, isImage=True)
-
-	sinal_FT = aplica_FFT_em_sinal(sinal, True)
-	
-	mostra_FT(sinal_FT, isImage=True)
-	
-	mu, sigma = 0, 25
-	sinal_ruidoso = adiciona_ruido_gauss(sinal, mu, sigma, True, f"Imagens/gourdsGauss.pgm")
-
-	mostra_sinal(sinal_ruidoso, isImage=True)
-
-	fft_sinal_ruidoso = aplica_FFT_em_sinal(sinal_ruidoso, True)
-
-	mostra_FT(fft_sinal_ruidoso, isImage=True)
+	coeficientes = aplica_DTWT_em_sinal(sinal, "haar", 3)
+	mostra_WT(coeficientes)
 
 	return 0
 
