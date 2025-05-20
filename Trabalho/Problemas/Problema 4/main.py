@@ -6,7 +6,7 @@ from math import pi
 nome_sinal = "std"
 isImage = False
 
-def menu_wavelet(sinal, isImage = False):
+def menu_wavelet():
 	print("Você escolheu visualizar a Transformada Wavelet do sinal.")
 
 	def reseta_parametros():
@@ -39,15 +39,50 @@ def menu_wavelet(sinal, isImage = False):
 		print("\n")
 		
 		if escolha == "F":
-			pass
+			print("Você escolheu mudar a família wavelet.")
+
+			print("\nEscolha sua família:")
+			print("\tHaar: haar")
+			print("\tDaubechies: dbN")
+			print("\tSymlet: symN")
+			print("\tCoiflet: coifN")
+			print("N indica a ordem dos filtros.")
+
+			familia = input("\nDigite sua escolha: ").lower()
+			print_parametros()
+
 		elif escolha == "L":
-			pass
+			print("Você escolheu mudar até que nível sua transformada vai.")
+			
+			while(True):
+				try:
+					level = int(input("Entre com o nível: "))
+					break
+				except:
+					print("\nO nível deve ser um valor inteiro.\n")
+			print_parametros()
+
 		elif escolha == "R":
-			pass
+			print("Você escolheu resetar os parâmetros.")
+			familia, level = reseta_parametros()
+			print("Os parâmetros foram resetados.")
+			print("\n")
+			print_parametros()
+
 		elif escolha == "M":
-			pass
+			print("\n")
+			print_menu()
+
 		elif escolha == "X":
-			pass
+			print("Você escolheu exibir o sinal transformado.")
+			print("Tem certeza? (y/n)")
+
+			escolha2 = str(input()).capitalize()
+
+			if escolha2 == "N":
+				continue
+			else:
+				return familia, level
 
 def menu_adiciona(sinal, tempos):
 	def print_menu():
@@ -451,7 +486,7 @@ def menu():
 	sinal, tempos = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
 
 	def print_menu():
-		print("Bem-vindo à resolução do Problema 3!") 
+		print("Bem-vindo à resolução do Problema 4!") 
 		print("Escolha sua opção: ")
 		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
 		print("\tF: Mostra a FT do sinal.\tW: Mostra a WT do sinal.")
@@ -504,8 +539,15 @@ def menu():
 		
 		elif escolha == "W":
 			print("\n")
-			coeficientes = menu_wavelet(sinal, isImage)
+			familia, level = menu_wavelet()
 			print("\n")
+
+			if isImage:
+				pass
+			
+			else:
+				coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
+				ul.mostra_WT(coeficientes)
 
 		elif escolha == "M":
 			print("\n")
