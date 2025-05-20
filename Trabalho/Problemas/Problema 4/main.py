@@ -6,6 +6,49 @@ from math import pi
 nome_sinal = "std"
 isImage = False
 
+def menu_wavelet(sinal, isImage = False):
+	print("Você escolheu visualizar a Transformada Wavelet do sinal.")
+
+	def reseta_parametros():
+		familia = "haar"
+		level = 2
+		return familia, level
+	
+	familia, level = reseta_parametros()
+
+	def print_parametros():
+		nonlocal familia, level
+
+		print("Os parâmetros atuais da WT são:")
+		print(f"Família: {familia}\tNível: {level}")
+	
+	def print_menu():
+		print("\nDefina os parâmetros da sua Transformada Wavelet:")
+
+		print_parametros()
+
+		print("\nEscolha sua opção: ")
+		print("\tF: Muda a família wavelet.\tL: Muda até que nível a transformada é calculada.")
+		print("\tR: Reseta os parâmetros para os originais.\tM: Mostra esse menu novamente.")
+		print("\tX: Exibe o sinal transformado.")
+
+	print_menu()
+
+	while True:
+		escolha = input("Digite sua escolha: ").capitalize()
+		print("\n")
+		
+		if escolha == "F":
+			pass
+		elif escolha == "L":
+			pass
+		elif escolha == "R":
+			pass
+		elif escolha == "M":
+			pass
+		elif escolha == "X":
+			pass
+
 def menu_adiciona(sinal, tempos):
 	def print_menu():
 		print(f"Você escolheu adicionar um sinal ao sinal {nome_sinal}.")
@@ -411,7 +454,7 @@ def menu():
 		print("Bem-vindo à resolução do Problema 3!") 
 		print("Escolha sua opção: ")
 		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
-		print("\tF: Mostra a FT do sinal.")
+		print("\tF: Mostra a FT do sinal.\tW: Mostra a WT do sinal.")
 		print("\tM: Mostra este menu novamente.\tX: Termina o programa.")
 		print("Foco: ", nome_sinal)
 
@@ -458,6 +501,11 @@ def menu():
 				ft = ul.aplica_FFT_em_sinal(sinal)
 				frequencias = ul.cria_array_frequencias(tempos)
 				ul.mostra_FT(ft, frequencias, escolha)
+		
+		elif escolha == "W":
+			print("\n")
+			coeficientes = menu_wavelet(sinal, isImage)
+			print("\n")
 
 		elif escolha == "M":
 			print("\n")
