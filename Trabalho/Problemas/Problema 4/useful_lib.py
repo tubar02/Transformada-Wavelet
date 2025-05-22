@@ -108,13 +108,26 @@ def aplica_DTWT_em_sinal(sinal, familia, nivel, isImage = False):
 		coeficientes = pywt.wavedec(sinal, wavelet=familia, level=nivel)
 		return coeficientes
 
-def mostra_WT(coeficientes, isImage = False):
+def mostra_WT(coeficientes, dt, isImage = False):
+	freq_max = (1 / dt) / 2
+	level = len(coeficientes) - 1
+
 	if isImage:
 		pass
 	else:
 		for i, c in enumerate(coeficientes):
 			plt.subplot(len(coeficientes), 1, len(coeficientes) - i)
 			plt.plot(c, label=f'Nível {len(coeficientes) - i}' if i > 0 else 'Aproximação')
+
+			if i == 0:
+				f_low = 0
+			else:	
+				f_low = freq_max / 2**(level - i + 1)
+
+			f_high = freq_max / 2**(level - i)
+			faixa = f"{f_low:.1f}–{f_high:.1f} Hz"
+			
+			plt.title(faixa)
 			plt.legend()
 			plt.grid(True)
 
