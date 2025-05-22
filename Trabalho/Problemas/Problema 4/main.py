@@ -396,7 +396,6 @@ def menu_muda_sinal(sinal, tempos):
 
 			if nome_apaga == nome_sinal:
 				nome_sinal = "std"
-
 			
 		elif escolha == "F":
 			print("Você escolheu focar em outro sinal.\n")
