@@ -19,23 +19,23 @@ def menu_wavelet():
 	def print_parametros():
 		nonlocal familia, level
 
-		print("Os parâmetros atuais da WT são:")
-		print(f"Família: {familia}\tNível: {level}")
+		print("\nOs parâmetros atuais da WT são:")
+		print(f"\tFamília: {familia}\t\tNível: {level}")
 	
 	def print_menu():
-		print("\nDefina os parâmetros da sua Transformada Wavelet:")
+		print("\nDefina os parâmetros da sua Transformada Wavelet.")
 
 		print_parametros()
 
 		print("\nEscolha sua opção: ")
-		print("\tF: Muda a família wavelet.\tL: Muda até que nível a transformada é calculada.")
-		print("\tR: Reseta os parâmetros para os originais.\tM: Mostra esse menu novamente.")
-		print("\tX: Exibe o sinal transformado.")
+		print("\tF: Muda a família wavelet.\t\t\tL: Muda até que nível a transformada é calculada.")
+		print("\tR: Reseta os parâmetros para os originais.")
+		print("\tM: Mostra esse menu novamente.\t\t\tX: Exibe o sinal transformado.")
 
 	print_menu()
 
 	while True:
-		escolha = input("Digite sua escolha: ").capitalize()
+		escolha = input("\nDigite sua escolha: ").capitalize()
 		print("\n")
 		
 		if escolha == "F":
