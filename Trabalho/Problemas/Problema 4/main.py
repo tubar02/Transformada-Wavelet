@@ -153,7 +153,8 @@ def menu_adiciona(sinal, tempos):
 			if escolha2 == "N":
 				continue
 			elif escolha2 == "Y":
-				return sinal, tempos, salvou
+				dt = tempos[1] - tempos[0]
+				return sinal, tempos, dt, salvou
 
 def menu_cria_sinal(opcao_N = False):
 	global nome_sinal
@@ -278,11 +279,11 @@ def menu_cria_sinal(opcao_N = False):
 					tempos = ul.cria_array_tempos(dt, n_pontos) 
 					sinal = ul.simula_sinal(tempos, omega, T, S_0)
 					ul.salva_sinal(sinal, tempos, nome_sinal)
-					return sinal, tempos
+					return sinal, tempos, dt
 				else:
 					tempos = ul.cria_array_tempos(dt, n_pontos) 
 					sinal = ul.simula_sinal(tempos, omega, T, S_0)
-					return sinal, tempos
+					return sinal, tempos, dt
 
 def menu_muda_sinal(sinal, tempos):
 	global nome_sinal, isImage
@@ -331,7 +332,7 @@ def menu_muda_sinal(sinal, tempos):
 					print(f"\t{nome_arq}")
 		
 		elif escolha == "A" and not isImage:
-			sinal, tempos, salvou = menu_adiciona(sinal, tempos)
+			sinal, tempos, dt, salvou = menu_adiciona(sinal, tempos)
 			print_menu()
 		elif escolha == "A" and isImage:
 			print("Opção não válida para imagens.")
@@ -361,7 +362,7 @@ def menu_muda_sinal(sinal, tempos):
 		
 		elif escolha == "N":
 			print("\n")
-			sinal, tempos = menu_cria_sinal(True)
+			sinal, tempos, dt = menu_cria_sinal(True)
 			print("\n")
 			print_menu()
 
@@ -417,7 +418,7 @@ def menu_muda_sinal(sinal, tempos):
 				if isImage:
 					sinal = ul.le_arquivo_sinal(caminho, True)
 				else:
-					sinal, tempos = ul.le_arquivo_sinal(caminho)
+					sinal, tempos, dt = ul.le_arquivo_sinal(caminho)
 				print("\nO foco foi alterado.")
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
@@ -464,9 +465,9 @@ def menu_muda_sinal(sinal, tempos):
 				continue
 			elif escolha2 == "Y" and salvou:
 				if isImage:
-					return sinal, None
+					return sinal, None, None
 				else:
-					return sinal, tempos
+					return sinal, tempos, dt
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
 				escolha3 = str(input()).capitalize()
@@ -475,14 +476,14 @@ def menu_muda_sinal(sinal, tempos):
 					continue
 				elif escolha3 == "Y":
 					if isImage:
-						return sinal, None
+						return sinal, None, None
 					else:
-						return sinal, tempos
+						return sinal, tempos, dt
 
 def menu():
 	global nome_sinal
 
-	sinal, tempos = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
+	sinal, tempos, dt = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
 
 	def print_menu():
 		print("Bem-vindo à resolução do Problema 4!") 
@@ -514,7 +515,7 @@ def menu():
 
 		elif escolha == "P":
 			print("\n")
-			sinal, tempos = menu_muda_sinal(sinal, tempos)
+			sinal, tempos, dt = menu_muda_sinal(sinal, tempos)
 			print("\n")
 			print_menu()
 		
