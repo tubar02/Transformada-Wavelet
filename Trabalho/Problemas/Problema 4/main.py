@@ -547,7 +547,7 @@ def menu():
 			
 			else:
 				coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
-				ul.mostra_WT(coeficientes)
+				ul.mostra_WT(coeficientes, dt)
 
 		elif escolha == "M":
 			print("\n")
