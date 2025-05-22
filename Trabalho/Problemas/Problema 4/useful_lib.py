@@ -19,14 +19,18 @@ def le_arquivo_sinal(caminho_arq, isImage = False):
 
 	else:
 		with open(f"{caminho_arq}", "r") as arquivo_sinal:
-			n_pontos = arquivo_sinal.readline()
+			n_pontos, dt = arquivo_sinal.readline().split()
+			n_pontos = int(n_pontos)
+			dt = float(dt)
 			sinal = np.array([complex(i) for i in arquivo_sinal.readline().split()])
 			tempos = np.array([float(i) for i in arquivo_sinal.readline().split()])
 		return sinal, tempos
 
 def salva_sinal(sinal, tempos, nome_sinal):
 	with open(f"Sinais/{nome_sinal}.txt", "w") as arquivo_sinal:
-		arquivo_sinal.write(str(len(sinal)) + "\n")
+		n_pontos = str(len(sinal))
+		dt = tempos[1] - tempos[0]
+		arquivo_sinal.write(n_pontos + " " + dt + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in sinal]) + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in tempos]) + "\n")
 
