@@ -6,7 +6,7 @@ from math import pi
 nome_sinal = "std"
 isImage = False
 
-def menu_wavelet():
+def menu_wavelet(sinal, dt):
 	print("Você escolheu visualizar a Transformada Wavelet do sinal.")
 
 	def reseta_parametros():
@@ -29,8 +29,9 @@ def menu_wavelet():
 
 		print("\nEscolha sua opção: ")
 		print("\tF: Muda a família wavelet.\t\t\tL: Muda até que nível a transformada é calculada.")
-		print("\tR: Reseta os parâmetros para os originais.")
-		print("\tM: Mostra esse menu novamente.\t\t\tX: Exibe o sinal transformado.")
+		print("\tR: Reseta os parâmetros para os originais.\tS: Exibe o sinal transformado.")
+		print("\tP: Filtra o sinal transformado.")
+		print("\tM: Mostra esse menu novamente.\t\t\tX: Sai deste menu.")
 
 	print_menu()
 
@@ -69,12 +70,19 @@ def menu_wavelet():
 			print("\n")
 			print_parametros()
 
+		elif escolha == "S":
+			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
+			ul.mostra_WT(coeficientes, dt)
+
+		elif escolha == "P":
+			pass
+
 		elif escolha == "M":
 			print("\n")
 			print_menu()
 
 		elif escolha == "X":
-			print("Você escolheu exibir o sinal transformado.")
+			print("Você escolheu sair deste menu.")
 			print("Tem certeza? (y/n)")
 
 			escolha2 = str(input()).capitalize()
@@ -82,7 +90,7 @@ def menu_wavelet():
 			if escolha2 == "N":
 				continue
 			else:
-				return familia, level
+				break
 
 def menu_adiciona(sinal, tempos):
 	def print_menu():
@@ -489,7 +497,7 @@ def menu():
 		print("Bem-vindo à resolução do Problema 4!") 
 		print("Escolha sua opção: ")
 		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
-		print("\tF: Mostra a FT do sinal.\tW: Mostra a WT do sinal.")
+		print("\tF: Mostra a FT do sinal.\tW: Trabalha com a WT do sinal.")
 		print("\tM: Mostra este menu novamente.\tX: Termina o programa.")
 		print("Foco: ", nome_sinal)
 
@@ -539,15 +547,8 @@ def menu():
 		
 		elif escolha == "W":
 			print("\n")
-			familia, level = menu_wavelet()
+			menu_wavelet(sinal, dt)
 			print("\n")
-
-			if isImage:
-				pass
-			
-			else:
-				coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
-				ul.mostra_WT(coeficientes, dt)
 
 		elif escolha == "M":
 			print("\n")
