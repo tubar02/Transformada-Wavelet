@@ -15,6 +15,7 @@ def menu_wavelet(sinal, dt):
 		return familia, level
 	
 	familia, level = reseta_parametros()
+	coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
 
 	def print_parametros():
 		nonlocal familia, level
@@ -51,6 +52,7 @@ def menu_wavelet(sinal, dt):
 
 			familia = input("\nDigite sua escolha: ").lower()
 			print_parametros()
+			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
 
 		elif escolha == "L":
 			print("Você escolheu mudar até que nível sua transformada vai.")
@@ -62,6 +64,7 @@ def menu_wavelet(sinal, dt):
 				except:
 					print("\nO nível deve ser um valor inteiro.\n")
 			print_parametros()
+			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
 
 		elif escolha == "R":
 			print("Você escolheu resetar os parâmetros.")
@@ -69,13 +72,29 @@ def menu_wavelet(sinal, dt):
 			print("Os parâmetros foram resetados.")
 			print("\n")
 			print_parametros()
+			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
 
 		elif escolha == "S":
-			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
 			ul.mostra_WT(coeficientes, dt)
 
 		elif escolha == "P":
-			pass
+			print("Você escolheu filtrar o sinal transformado.")
+			print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
+
+			tamanho = len(sinal)
+
+			print(f"Seu sinal original possui {tamanho} pontos.\n")
+
+			nivel = int(input(f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "))
+			indice = int(input(f"Entre com um índice de 0 a {tamanho - 1} a partir do qual os coeficientes serão zerados: "))
+			
+			if nivel != 0:
+				nivel = nivel * (-1)
+			
+			coeficientes[nivel][indice::] = 0
+
+			print("\nSeu sinal foi filtrado.")
+
 
 		elif escolha == "M":
 			print("\n")
