@@ -30,7 +30,7 @@ def salva_sinal(sinal, tempos, nome_sinal):
 	with open(f"Sinais/{nome_sinal}.txt", "w") as arquivo_sinal:
 		n_pontos = str(len(sinal))
 		dt = tempos[1] - tempos[0]
-		arquivo_sinal.write(n_pontos + " " + dt + "\n")
+		arquivo_sinal.write(str(n_pontos) + " " + str(dt) + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in sinal]) + "\n")
 		arquivo_sinal.write(" ".join([str(i) for i in tempos]) + "\n")
 
