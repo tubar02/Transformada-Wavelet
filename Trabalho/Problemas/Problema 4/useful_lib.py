@@ -134,6 +134,13 @@ def mostra_WT(coeficientes, dt, isImage = False):
 		plt.tight_layout()
 		plt.show()
 
+def aplica_IDTWT_em_sinal(coeficientes, familia, isImage):
+	if isImage:
+		pass
+	else:
+		sinal_rec = pywt.waverec(coeficientes, wavelet=familia)
+		return sinal_rec
+
 def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 	if isImage:
 		ruido = mil.Ruido(_sinal)

@@ -6,7 +6,38 @@ from math import pi
 nome_sinal = "std"
 isImage = False
 
-def menu_wavelet(sinal, dt):
+def mostrar_sinal(sinal, tempos, isImage):
+	if isImage:
+		ul.mostra_sinal(sinal, isImage=isImage)
+	else:
+		print("Como você deseja visualizar seu sinal?\n")
+		print("\tr: Componente real.\ti: Componente imaginária.")
+		print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+		escolha = input("Entre com sua escolha: ").lower()
+		ul.mostra_sinal(sinal, tempos, escolha)
+
+def salvar_sinal(sinal, tempos):
+	nome_sinal = input("Digite o nome que deseja dar a este sinal: ")
+
+	if nome_sinal == "std":
+		print("Esse é o sinal padrão, e não pode ser alterado.")
+		return
+
+	caminho = Path(f'Sinais/{nome_sinal}.txt')
+	if caminho.exists():
+		print("Você está prestes a sobrescrever um sinal, tem certeza? (y/n)")
+		escolha3 = str(input()).capitalize()
+
+		if escolha3 == "N":
+			return
+
+	ul.salva_sinal(sinal, tempos, nome_sinal)
+			
+	print("\nO sinal foi salvo com sucesso.")
+	salvou = True
+	return salvou
+
+def menu_wavelet(sinal, tempos, dt):
 	print("Você escolheu visualizar a Transformada Wavelet do sinal.")
 
 	def reseta_parametros():
@@ -31,7 +62,7 @@ def menu_wavelet(sinal, dt):
 		print("\nEscolha sua opção: ")
 		print("\tF: Muda a família wavelet.\t\t\tL: Muda até que nível a transformada é calculada.")
 		print("\tR: Reseta os parâmetros para os originais.\tS: Exibe o sinal transformado.")
-		print("\tP: Filtra o sinal transformado.")
+		print("\tP: Filtra o sinal transformado.\t\t\tI: IDTWT do sinal filtrado.")
 		print("\tM: Mostra esse menu novamente.\t\t\tX: Sai deste menu.")
 
 	print_menu()
@@ -86,15 +117,29 @@ def menu_wavelet(sinal, dt):
 			print(f"Seu sinal original possui {tamanho} pontos.\n")
 
 			nivel = int(input(f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "))
-			indice = int(input(f"Entre com um índice de 0 a {tamanho - 1} a partir do qual os coeficientes serão zerados: "))
-			
+
 			if nivel != 0:
 				nivel = nivel * (-1)
+
+			indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
 			
 			coeficientes[nivel][indice::] = 0
 
 			print("\nSeu sinal foi filtrado.")
 
+		elif escolha == "I":
+			print("Você escolheu salvar a IDTWT em um arquivo.")
+
+			sinal_rec = ul.aplica_IDTWT_em_sinal(coeficientes, familia, isImage)
+			salvou = salvar_sinal(sinal_rec, tempos)
+
+			print("Deseja visualizar o sinal reconstruído? (y/n)")
+
+			escolha2 = input().capitalize()
+
+			if escolha2 == "Y":
+				print("\n")
+				mostrar_sinal(sinal_rec, tempos, isImage)
 
 		elif escolha == "M":
 			print("\n")
@@ -312,7 +357,7 @@ def menu_cria_sinal(opcao_N = False):
 					sinal = ul.simula_sinal(tempos, omega, T, S_0)
 					return sinal, tempos, dt
 
-def menu_muda_sinal(sinal, tempos):
+def menu_muda_sinal(sinal, tempos, dt):
 	global nome_sinal, isImage
 
 	salvou = True
@@ -366,24 +411,7 @@ def menu_muda_sinal(sinal, tempos):
 
 		elif escolha == "S" and not isImage:
 			print("Você escolheu salvar o sinal em um arquivo.\n")
-			nome_sinal = input("Digite o nome que deseja dar a este sinal: ")
-
-			if nome_sinal == "std":
-				print("Esse é o sinal padrão, e não pode ser alterado.")
-				continue
-
-			caminho = Path(f'Sinais/{nome_sinal}.txt')
-			if caminho.exists():
-				print("Você está prestes a sobrescrever um sinal, tem certeza? (y/n)")
-				escolha3 = str(input()).capitalize()
-
-				if escolha3 == "N":
-					continue
-
-			ul.salva_sinal(sinal, tempos, nome_sinal)
-			
-			print("\nO sinal foi salvo com sucesso.")
-			salvou = True
+			salvou = salvar_sinal(sinal, tempos)
 		elif escolha == "S" and isImage:
 			print("Opção não válida para imagens.")
 		
@@ -529,20 +557,11 @@ def menu():
 		if escolha == "S":
 			print("Você escolheu ver o gráfico do sinal no domínio do tempo.")
 
-			if isImage:
-				ul.mostra_sinal(sinal, isImage=True)
-			else:
-				print("Como você deseja visualizar seu sinal?\n")
-				print("\tr: Componente real.\ti: Componente imaginária.")
-				print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
-
-				escolha = input("Entre com sua escolha: ").lower()
-
-				ul.mostra_sinal(sinal, tempos, escolha)
+			mostrar_sinal(sinal, tempos, isImage)
 
 		elif escolha == "P":
 			print("\n")
-			sinal, tempos, dt = menu_muda_sinal(sinal, tempos)
+			sinal, tempos, dt = menu_muda_sinal(sinal, tempos, dt)
 			print("\n")
 			print_menu()
 		
@@ -566,7 +585,7 @@ def menu():
 		
 		elif escolha == "W":
 			print("\n")
-			menu_wavelet(sinal, dt)
+			menu_wavelet(sinal, tempos, dt)
 			print("\n")
 
 		elif escolha == "M":
