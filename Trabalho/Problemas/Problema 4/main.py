@@ -579,9 +579,18 @@ def menu():
 
 				escolha = input("Entre com sua escolha: ").lower()
 
+				print("\nDeseja visualizar o espectro em ppm? (y/n)")
+
+				escolha2 = input().lower()
+
+				if escolha2 == "y":
+					escolha2 = True
+				else:
+					escolha2 = False
+
 				ft = ul.aplica_FFT_em_sinal(sinal)
 				frequencias = ul.cria_array_frequencias(tempos)
-				ul.mostra_FT(ft, frequencias, escolha)
+				ul.mostra_FT(ft, frequencias, escolha, escolha2)
 		
 		elif escolha == "W":
 			print("\n")

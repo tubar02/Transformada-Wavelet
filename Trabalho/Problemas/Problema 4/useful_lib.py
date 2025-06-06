@@ -77,11 +77,15 @@ def cria_array_frequencias(tempos):
 	dt = tempos[1] - tempos[0]
 	return np.fft.fftfreq(n_pontos, dt)
 
-def mostra_FT(ft, frequencia = None, componente = None, isImage = False):
+def mostra_FT(ft, frequencia = None, componente = None, ppm = False, isImage = False):
 	if isImage:
 		imagem = ft.representacao()
 		mil.print_grayscale_image(imagem)
 	else:
+		if ppm:
+			freq_ref = 127.74 #Para um campo de 3T (em MHz)
+			frequencia = (frequencia - freq_ref) / freq_ref 
+
 		ft, frequencia = np.fft.fftshift(ft), np.fft.fftshift(frequencia) #realiza o shift
 		assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
 		if componente == "r": 
@@ -94,7 +98,11 @@ def mostra_FT(ft, frequencia = None, componente = None, isImage = False):
 		elif componente == "m":
 			plt.plot(frequencia, np.abs(ft), label="Módulo")
 
-		plt.xlabel('Frequência (Hz)')
+		if ppm:
+			plt.xlabel('Deslocamento Químico (ppm)')
+		else:
+			plt.xlabel('Frequência (Hz)')
+			
 		plt.ylabel('FT do Sinal')
 		plt.title('Espectro de Frequência do Sinal')
 		plt.legend()
