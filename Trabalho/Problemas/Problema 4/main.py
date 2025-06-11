@@ -37,6 +37,94 @@ def salvar_sinal(sinal, tempos):
 	salvou = True
 	return salvou
 
+def menu_fourier(sinal, tempos, isImage):
+	def print_menu():
+		print("Você escolheu ver o sinal no domínio da frequência.\n")
+		print("Escolha sua opção: ")
+		print("\tF: Mostra a FT do sinal.\tR: Calcula e mostra o resíduo deste sinal com outro.")
+		print("\tM: Mostra este menu novamente.\tX: Sai deste menu.")
+
+	print_menu()
+
+	while True:
+		escolha = input("\nDigite sua escolha: ").capitalize()
+		print("\n")
+
+		if escolha == "F":
+			print("Você escolheu visualizar o espectro deste sinal.\n")
+
+			if isImage:
+				ft = ul.aplica_FFT_em_sinal(sinal, True)
+				ul.mostra_FT(ft, isImage=True)
+					
+			else:
+				print("Como você deseja visualizar seu sinal transformado?\n")
+				print("\tr: Componente real.\ti: Componente imaginária.")
+				print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+
+				escolha = input("Entre com sua escolha: ").lower()
+
+				print("\nDeseja visualizar o espectro em ppm? (y/n)")
+
+				escolha2 = input().lower()
+
+				if escolha2 == "y":
+					escolha2 = True
+				else:
+					escolha2 = False
+
+				ft = ul.aplica_FFT_em_sinal(sinal)
+				frequencias = ul.cria_array_frequencias(tempos)
+				ul.mostra_FT(ft, frequencias, escolha, escolha2)
+
+		elif escolha == "R":
+			print("Você escolheu calcular o resíduo deste sinal.\n")
+
+			print("Para isso, você deve entrar com o nome do sinal original.")
+			nome_sinal = input("Entre com o nome do sinal original: ")
+			caminho = Path(f'Sinais/{nome_sinal}.txt')
+
+			if not caminho.exists():
+				print("\nNão existe nenhum sinal com esse nome.")
+				continue
+			
+			sinal_original, tempos_original, dt = ul.le_arquivo_sinal(caminho)
+			ft_original = ul.aplica_FFT_em_sinal(sinal_original)
+			frequencias_original = ul.cria_array_frequencias(tempos_original)
+			ft = ul.aplica_FFT_em_sinal(sinal)
+
+			print("\nComo você deseja visualizar seu resíduo?\n")
+			print("\tr: Componente real.\ti: Componente imaginária.")
+			print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+
+			escolha = input("Entre com sua escolha: ").lower()
+
+			print("\nDeseja visualizar o espectro em ppm? (y/n)")
+
+			escolha2 = input().lower()
+
+			if escolha2 == "y":
+				escolha2 = True
+			else:
+				escolha2 = False
+
+			ul.mostra_residuo(ft_original, frequencias_original, ft, escolha, escolha2)
+
+		elif escolha == "M":
+			print("\n")
+			print_menu()
+		
+		elif escolha == "X":
+			print("Você escolheu sair deste menu.")
+			print("Tem certeza? (y/n)")
+
+			escolha2 = str(input()).capitalize()
+
+			if escolha2 == "N":
+				continue
+			else:
+				break
+
 def menu_wavelet(sinal, tempos, dt):
 	print("Você escolheu visualizar a Transformada Wavelet do sinal.")
 
@@ -63,7 +151,7 @@ def menu_wavelet(sinal, tempos, dt):
 		print("\tF: Muda a família wavelet.\t\t\tL: Muda até que nível a transformada é calculada.")
 		print("\tR: Reseta os parâmetros para os originais.\tS: Exibe o sinal transformado.")
 		print("\tP: Filtra o sinal transformado.\t\t\tI: IDTWT do sinal filtrado.")
-		print("\tM: Mostra esse menu novamente.\t\t\tX: Sai deste menu.")
+		print("\tM: Mostra este menu novamente.\t\t\tX: Sai deste menu.")
 
 	print_menu()
 
@@ -544,7 +632,7 @@ def menu():
 		print("Bem-vindo à resolução do Problema 4!") 
 		print("Escolha sua opção: ")
 		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
-		print("\tF: Mostra a FT do sinal.\tW: Trabalha com a WT do sinal.")
+		print("\tF: Trabalha com a FT do sinal.\tW: Trabalha com a WT do sinal.")
 		print("\tM: Mostra este menu novamente.\tX: Termina o programa.")
 		print("Foco: ", nome_sinal)
 
@@ -566,31 +654,9 @@ def menu():
 			print_menu()
 		
 		elif escolha == "F":
-			print("Você escolheu ver o sinal no domínio da frequência.")
-
-			if isImage:
-				ft = ul.aplica_FFT_em_sinal(sinal, True)
-				ul.mostra_FT(ft, isImage=True)
-			
-			else:
-				print("Como você deseja visualizar seu sinal transformado?\n")
-				print("\tr: Componente real.\ti: Componente imaginária.")
-				print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
-
-				escolha = input("Entre com sua escolha: ").lower()
-
-				print("\nDeseja visualizar o espectro em ppm? (y/n)")
-
-				escolha2 = input().lower()
-
-				if escolha2 == "y":
-					escolha2 = True
-				else:
-					escolha2 = False
-
-				ft = ul.aplica_FFT_em_sinal(sinal)
-				frequencias = ul.cria_array_frequencias(tempos)
-				ul.mostra_FT(ft, frequencias, escolha, escolha2)
+			print("\n")
+			menu_fourier(sinal, tempos, isImage)
+			print("\n")
 		
 		elif escolha == "W":
 			print("\n")
