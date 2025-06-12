@@ -204,7 +204,12 @@ def menu_wavelet(sinal, tempos, dt):
 
 			print(f"Seu sinal original possui {tamanho} pontos.\n")
 
-			nivel = int(input(f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "))
+			if level == 1:
+				entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
+			else:
+				entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
+
+			nivel = int(input(entrada))
 
 			if nivel != 0:
 				nivel = nivel * (-1)
