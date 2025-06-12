@@ -598,7 +598,6 @@ class Ruido(): #classe para acrescentar ruído em imagens digitais
 			except:
 				print(linha, coluna)
 
-
 #funções úteis
 def pgm_from_matrix(outputpath, matrix):
 	with open(outputpath, "w") as arquivo:
