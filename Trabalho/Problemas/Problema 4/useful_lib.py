@@ -70,19 +70,26 @@ def aplica_FFT_em_sinal(sinal, isImage = False):
 		imagem.shift()
 		return imagem
 	else:
-		return np.fft.fft(sinal)
+		ft = np.fft.fft(sinal)
+		ft = np.fft.fftshift(ft)
+		return ft
 
 def cria_array_frequencias(tempos):
 	n_pontos = len(tempos)
 	dt = tempos[1] - tempos[0]
-	return np.fft.fftfreq(n_pontos, dt)
+	frequencia = np.fft.fftfreq(n_pontos, dt)
+	frequencia = np.fft.fftshift(frequencia)
+	return frequencia
 
-def mostra_FT(ft, frequencia = None, componente = None, isImage = False):
+def mostra_FT(ft, frequencia = None, componente = None, ppm = False, isImage = False):
 	if isImage:
 		imagem = ft.representacao()
 		mil.print_grayscale_image(imagem)
 	else:
-		ft, frequencia = np.fft.fftshift(ft), np.fft.fftshift(frequencia) #realiza o shift
+		if ppm:
+			freq_ref = 127.74 #Para um campo de 3T (em MHz)
+			frequencia = (frequencia - freq_ref) / freq_ref 
+
 		assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
 		if componente == "r": 
 			plt.plot(frequencia, ft.real, label="Parte real")
@@ -94,12 +101,45 @@ def mostra_FT(ft, frequencia = None, componente = None, isImage = False):
 		elif componente == "m":
 			plt.plot(frequencia, np.abs(ft), label="Módulo")
 
-		plt.xlabel('Frequência (Hz)')
+		if ppm:
+			plt.xlabel('Deslocamento Químico (ppm)')
+		else:
+			plt.xlabel('Frequência (Hz)')
+			
 		plt.ylabel('FT do Sinal')
 		plt.title('Espectro de Frequência do Sinal')
 		plt.legend()
 		plt.grid()
 		plt.show()
+
+def mostra_residuo(ft_original, frequencia_original, ft_filtrado, componente = "m", ppm = False):
+	ft_plota = ft_original - ft_filtrado
+
+	if ppm:
+		freq_ref = 127.74 #Para um campo de 3T (em MHz)
+		frequencia_original = (frequencia_original - freq_ref) / freq_ref 
+
+	assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
+	if componente == "r": 
+		plt.plot(frequencia_original, ft_plota.real, label="Parte real do resíduo")
+	elif componente == "i":
+		plt.plot(frequencia_original, ft_plota.imag, label="Parte imaginária do resíduo")
+	elif componente == "ri":
+		plt.plot(frequencia_original, ft_plota.real, label="Parte real do resíduo")
+		plt.plot(frequencia_original, ft_plota.imag, label="Parte imaginária do resíduo")
+	elif componente == "m":
+		plt.plot(frequencia_original, np.abs(ft_plota), label="Módulo do resíduo")
+	
+	if ppm:
+		plt.xlabel('Deslocamento Químico (ppm)')
+	else:
+		plt.xlabel('Frequência (Hz)')
+
+	plt.ylabel('ΔFT')
+	plt.title('Resíduo Espectral')
+	plt.legend()
+	plt.grid()
+	plt.show()
 	
 def aplica_DTWT_em_sinal(sinal, familia, nivel, isImage = False):
 	if isImage:
@@ -155,11 +195,20 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def main():
-	sinal, tempos = le_arquivo_sinal("Sinais/omega100.txt")
+	sinal, tempos, dt = le_arquivo_sinal("Sinais/SinalMNR_gauss005.txt")
 	mostra_sinal(sinal, tempos, "r")
 
-	coeficientes = aplica_DTWT_em_sinal(sinal, "haar", 3)
-	mostra_WT(coeficientes)
+	sinal2, tempos2, dt2 = le_arquivo_sinal("Sinais/SinalMNR_gauss005_sym2_filter1111.txt")
+	mostra_sinal(sinal2, tempos2, "r")
+
+	ft = aplica_FFT_em_sinal(sinal)
+	ft2 = aplica_FFT_em_sinal(sinal2)
+	frequencia = cria_array_frequencias(tempos)
+	frequencia2 = cria_array_frequencias(tempos2)
+
+	mostra_FT(ft, frequencia, "m")
+	mostra_FT(ft2, frequencia2, "m")
+	mostra_residuo(ft, frequencia, ft2)
 
 	return 0
 
