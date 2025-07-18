@@ -141,22 +141,22 @@ def mostra_residuo(ft_original, frequencia_original, ft_filtrado, componente = "
 	plt.grid()
 	plt.show()
 	
-def aplica_DTWT_em_sinal(sinal, familia, nivel, isImage = False):
+def aplica_DTWT_em_sinal(sinal, familia, nivel = None, isImage = False):
 	if isImage:
-		pass
+		imagem = mil.Wavelet_Image(sinal)
+		return imagem
 
 	else:
 		coeficientes = pywt.wavedec(sinal, wavelet=familia, level=nivel)
 		return coeficientes
 
-def mostra_WT(coeficientes, dt, componente = "m", isImage = False):
-	freq_max = (1 / dt) / 2
-	level = len(coeficientes) - 1
-
+def mostra_WT(coeficientes, dt = None, componente = "m", isImage = False):
 	if isImage:
-		pass
+		coeficientes.representar_coeficientes()
 
 	else:
+		freq_max = (1 / dt) / 2
+		level = len(coeficientes) - 1
 		for i, c in enumerate(coeficientes):
 			assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
 
@@ -187,9 +187,11 @@ def mostra_WT(coeficientes, dt, componente = "m", isImage = False):
 		plt.tight_layout()
 		plt.show()
 
-def aplica_IDTWT_em_sinal(coeficientes, familia, isImage):
+def aplica_IDTWT_em_sinal(coeficientes, familia = None, isImage = False):
 	if isImage:
-		pass
+		imagem_rec = coeficientes.reconstruir()
+		return imagem_rec
+
 	else:
 		sinal_rec = pywt.waverec(coeficientes, wavelet=familia)
 		return sinal_rec
@@ -208,20 +210,13 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def main():
-	sinal, tempos, dt = le_arquivo_sinal("Sinais/SinalMNR_gauss005.txt")
-	mostra_sinal(sinal, tempos, "r")
-
-	sinal2, tempos2, dt2 = le_arquivo_sinal("Sinais/SinalMNR_gauss005_sym2_filter1111.txt")
-	mostra_sinal(sinal2, tempos2, "r")
-
-	ft = aplica_FFT_em_sinal(sinal)
-	ft2 = aplica_FFT_em_sinal(sinal2)
-	frequencia = cria_array_frequencias(tempos)
-	frequencia2 = cria_array_frequencias(tempos2)
-
-	mostra_FT(ft, frequencia, "m")
-	mostra_FT(ft2, frequencia2, "m")
-	mostra_residuo(ft, frequencia, ft2)
+	imagem = le_arquivo_sinal("Imagens//gourds.pgm", True)
+	wavelet = aplica_DTWT_em_sinal(imagem, "db1", isImage=True)
+	mostra_WT(wavelet, isImage=True)
+	imagem_reconstroi = aplica_IDTWT_em_sinal(wavelet, isImage=True)
+	mil.print_grayscale_image(imagem_reconstroi)
+	are_equal = np.allclose(imagem.pixels, imagem_reconstroi.pixels, atol=1e-5, rtol=1e-3)
+	print("As matrizes são aproximadamente iguais?", are_equal)
 
 	return 0
 
