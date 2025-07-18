@@ -125,7 +125,7 @@ def menu_fourier(sinal, tempos, isImage):
 			else:
 				break
 
-def menu_wavelet(sinal, tempos, dt):
+def menu_wavelet(sinal, tempos, dt, isImage):
 	print("Você escolheu visualizar a Transformada Wavelet do sinal.")
 
 	def reseta_parametros():
@@ -194,7 +194,7 @@ def menu_wavelet(sinal, tempos, dt):
 			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
 
 		elif escolha == "S":
-			ul.mostra_WT(coeficientes, dt)
+			ul.mostra_WT(coeficientes, dt, isImage)
 
 		elif escolha == "P":
 			print("Você escolheu filtrar o sinal transformado.")
@@ -665,7 +665,7 @@ def menu():
 		
 		elif escolha == "W":
 			print("\n")
-			menu_wavelet(sinal, tempos, dt)
+			menu_wavelet(sinal, tempos, dt, isImage)
 			print("\n")
 
 		elif escolha == "M":

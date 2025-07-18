@@ -144,6 +144,7 @@ def mostra_residuo(ft_original, frequencia_original, ft_filtrado, componente = "
 def aplica_DTWT_em_sinal(sinal, familia, nivel, isImage = False):
 	if isImage:
 		pass
+
 	else:
 		coeficientes = pywt.wavedec(sinal, wavelet=familia, level=nivel)
 		return coeficientes
@@ -154,6 +155,7 @@ def mostra_WT(coeficientes, dt, isImage = False):
 
 	if isImage:
 		pass
+
 	else:
 		for i, c in enumerate(coeficientes):
 			plt.subplot(len(coeficientes), 1, len(coeficientes) - i)

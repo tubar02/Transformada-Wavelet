@@ -5,6 +5,7 @@ import numpy as np
 from copy import deepcopy, copy
 import numpy.fft as fp
 import random as rd
+import pywt
 
 #classe que representa uma imagem digital
 class Image:
@@ -571,7 +572,11 @@ class Fourier_Image(Image):
 	def _pixel_pos_filtro(matriz_complexa):
 		matriz = [[int(round(abs(z))) for z in linha] for linha in matriz_complexa] #pega o módulo
 		return matriz
-	
+
+class Wavelet_Image(Image):
+	def __init__(self, imagem):
+		super().__init__(imagem._local)
+
 class Ruido(): #classe para acrescentar ruído em imagens digitais
 	def __init__(self, imagem): #requer uma imagem para inicializar as dimensões
 		self.dimensions = imagem.dimensions 
