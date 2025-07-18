@@ -194,7 +194,12 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
 
 		elif escolha == "S":
-			ul.mostra_WT(coeficientes, dt, isImage)
+			print("Como você deseja visualizar seu sinal transformado?\n")
+			print("\tr: Componente real.\ti: Componente imaginária.")
+			print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+
+			escolha = input("Entre com sua escolha: ").lower()
+			ul.mostra_WT(coeficientes, dt, escolha, isImage)
 
 		elif escolha == "P":
 			print("Você escolheu filtrar o sinal transformado.")

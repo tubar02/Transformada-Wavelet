@@ -149,7 +149,7 @@ def aplica_DTWT_em_sinal(sinal, familia, nivel, isImage = False):
 		coeficientes = pywt.wavedec(sinal, wavelet=familia, level=nivel)
 		return coeficientes
 
-def mostra_WT(coeficientes, dt, isImage = False):
+def mostra_WT(coeficientes, dt, componente = "m", isImage = False):
 	freq_max = (1 / dt) / 2
 	level = len(coeficientes) - 1
 
@@ -158,8 +158,19 @@ def mostra_WT(coeficientes, dt, isImage = False):
 
 	else:
 		for i, c in enumerate(coeficientes):
+			assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
+
 			plt.subplot(len(coeficientes), 1, len(coeficientes) - i)
-			plt.plot(c, label=f'Nível {len(coeficientes) - i}' if i > 0 else 'Aproximação')
+
+			if componente == "r": 
+				plt.plot(c.real, label=f'Nível {len(coeficientes) - i} - Real' if i > 0 else 'Aproximação')
+			elif componente == "i":
+				plt.plot(c.imag, label=f'Nível {len(coeficientes) - i} - Imag' if i > 0 else 'Aproximação')
+			elif componente == "ri":
+				plt.plot(c.real, label=f'Nível {len(coeficientes) - i} - Real' if i > 0 else 'Aproximação')
+				plt.plot(c.imag, label=f'Nível {len(coeficientes) - i} - Imag' if i > 0 else 'Aproximação')
+			elif componente == "m":
+				plt.plot(np.abs(c), label=f'Nível {len(coeficientes) - i} - Mód' if i > 0 else 'Aproximação')
 
 			if i == 0:
 				f_low = 0
