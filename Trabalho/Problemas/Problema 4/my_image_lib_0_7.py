@@ -574,37 +574,37 @@ class Fourier_Image(Image):
 		return matriz
 
 class Wavelet_Image(Image):
-    def __init__(self, imagem, wavelet='db1'):
-        super().__init__(imagem._local)
-        self.wavelet = wavelet
-        self.coef = None
-        self.aplicar_transformada()
+	def __init__(self, imagem, wavelet='db1'):
+		super().__init__(imagem._local)
+		self.wavelet = wavelet
+		self.coef = None
+		self.aplicar_transformada()
 
-    def aplicar_transformada(self):
-        matriz = np.array(self.pixels)
-        self.coef = pywt.dwt2(matriz, self.wavelet)
+	def aplicar_transformada(self):
+		self.coef = pywt.dwt2(self.pixels, self.wavelet)
 
-    def obter_coeficientes(self):
-        return self.coef  # retorna (LL, (LH, HL, HH))
+	def obter_coeficientes(self):
+		return self.coef  # retorna (LL, (LH, HL, HH))
 
-    def reconstruir(self):
-        matriz_rec = pywt.idwt2(self.coef, self.wavelet)
-        matriz_rec = np.clip(matriz_rec, 0, 255).astype(int).tolist()
-        return pgm_from_matrix(self._local[:-4] + "_reconstruida.pgm", matriz_rec)
+	def reconstruir(self):
+		matriz_rec = pywt.idwt2(self.coef, self.wavelet)
+		original = np.array(self.pixels, dtype=float)
+		max_antigo, max_novo = Image._max_matriz(self.pixels), Image._max_matriz(matriz_rec)
+		matriz_rec = np.clip(matriz_rec, 0, 255).round().astype(int).tolist()
+		return pgm_from_matrix(self._local[:-4] + "_reconstruida.pgm", matriz_rec)
 
-    def representar_coeficientes(self):
-        LL, (LH, HL, HH) = self.coef
-        fig, axs = plt.subplots(2, 2, figsize=(8, 8))
-        axs[0, 0].imshow(LL, cmap='gray'); axs[0, 0].set_title('LL (Aproximação)')
-        axs[0, 1].imshow(LH, cmap='gray'); axs[0, 1].set_title('LH (Detalhe Horizontal)')
-        axs[1, 0].imshow(HL, cmap='gray'); axs[1, 0].set_title('HL (Detalhe Vertical)')
-        axs[1, 1].imshow(HH, cmap='gray'); axs[1, 1].set_title('HH (Detalhe Diagonal)')
-        for ax in axs.ravel():
-            ax.axis('off')
-        plt.tight_layout()
-        plt.show()
-
-
+	def representar_coeficientes(self):
+		LL, (LH, HL, HH) = self.coef
+		fig, axs = plt.subplots(2, 2, figsize=(8, 8))
+		axs[0, 0].imshow(LL, cmap='gray'); axs[0, 0].set_title('LL (Aproximação)')
+		axs[0, 1].imshow(LH, cmap='gray'); axs[0, 1].set_title('LH (Detalhe Horizontal)')
+		axs[1, 0].imshow(HL, cmap='gray'); axs[1, 0].set_title('HL (Detalhe Vertical)')
+		axs[1, 1].imshow(HH, cmap='gray'); axs[1, 1].set_title('HH (Detalhe Diagonal)')
+		for ax in axs.ravel():
+			ax.axis('off')
+		plt.tight_layout()
+		plt.show()
+		
 class Ruido(): #classe para acrescentar ruído em imagens digitais
 	def __init__(self, imagem): #requer uma imagem para inicializar as dimensões
 		self.dimensions = imagem.dimensions 

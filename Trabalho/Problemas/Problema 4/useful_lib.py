@@ -143,7 +143,7 @@ def mostra_residuo(ft_original, frequencia_original, ft_filtrado, componente = "
 	
 def aplica_DTWT_em_sinal(sinal, familia, nivel = None, isImage = False):
 	if isImage:
-		imagem = mil.Wavelet_Image(sinal)
+		imagem = mil.Wavelet_Image(sinal, familia)
 		return imagem
 
 	else:
@@ -210,12 +210,13 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def main():
-	imagem = le_arquivo_sinal("Imagens//gourds.pgm", True)
-	wavelet = aplica_DTWT_em_sinal(imagem, "db1", isImage=True)
+	imagem = le_arquivo_sinal("Imagens//teste.pgm", True)
+	wavelet = aplica_DTWT_em_sinal(imagem, "coif1", isImage=True)
 	mostra_WT(wavelet, isImage=True)
 	imagem_reconstroi = aplica_IDTWT_em_sinal(wavelet, isImage=True)
 	mil.print_grayscale_image(imagem_reconstroi)
-	are_equal = np.allclose(imagem.pixels, imagem_reconstroi.pixels, atol=1e-5, rtol=1e-3)
+	mil.print_grayscale_image(imagem)
+	are_equal = np.allclose(imagem.pixels, imagem_reconstroi.pixels)
 	print("As matrizes são aproximadamente iguais?", are_equal)
 
 	return 0
