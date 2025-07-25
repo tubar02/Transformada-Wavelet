@@ -574,33 +574,49 @@ class Fourier_Image(Image):
 		return matriz
 
 class Wavelet_Image(Image):
-	def __init__(self, imagem, wavelet='db1'):
+	def __init__(self, imagem, wavelet='db1', level = 1):
 		super().__init__(imagem._local)
 		self.wavelet = wavelet
+		self.level = level
 		self.coef = None
 		self.aplicar_transformada()
 
 	def aplicar_transformada(self):
-		self.coef = pywt.dwt2(self.pixels, self.wavelet)
+		self.coef = pywt.wavedec2(self.pixels, self.wavelet, level = self.level)
 
-	def obter_coeficientes(self):
+	@property
+	def coeficientes(self):
 		return self.coef  # retorna (LL, (LH, HL, HH))
 
 	def reconstruir(self):
-		matriz_rec = pywt.idwt2(self.coef, self.wavelet)
-		original = np.array(self.pixels, dtype=float)
-		max_antigo, max_novo = Image._max_matriz(self.pixels), Image._max_matriz(matriz_rec)
+		matriz_rec = pywt.waverec2(self.coef, self.wavelet)
 		matriz_rec = np.clip(matriz_rec, 0, 255).round().astype(int).tolist()
 		return pgm_from_matrix(self._local[:-4] + "_reconstruida.pgm", matriz_rec)
 
-	def representar_coeficientes(self):
-		LL, (LH, HL, HH) = self.coef
-		fig, axs = plt.subplots(2, 2, figsize=(8, 8))
-		axs[0, 0].imshow(LL, cmap='gray'); axs[0, 0].set_title('LL (Aproximação)')
-		axs[0, 1].imshow(LH, cmap='gray'); axs[0, 1].set_title('LH (Detalhe Horizontal)')
-		axs[1, 0].imshow(HL, cmap='gray'); axs[1, 0].set_title('HL (Detalhe Vertical)')
-		axs[1, 1].imshow(HH, cmap='gray'); axs[1, 1].set_title('HH (Detalhe Diagonal)')
-		for ax in axs.ravel():
+	def representar_nivel(self, nivel):
+		"""
+		Mostra os coeficientes de um nível específico (1, 2, ...)
+		Sempre inclui cA_final como referência.
+		"""
+		max_nivel = self.level
+		if nivel < 1 or nivel > max_nivel:
+			raise ValueError(f"Nível inválido: {nivel}. Deve estar entre 1 e {max_nivel}.")
+
+		cA_final = self.coef[0]
+		detalhes = self.coef[max_nivel - nivel + 1]  # ex: nível 1 => coef[2]
+		cH, cV, cD = detalhes
+
+		fig, axs = plt.subplots(1, 4, figsize=(12, 4))
+		axs[0].imshow(np.abs(cA_final), cmap='gray')
+		axs[0].set_title(f'Aproximação {max_nivel}')
+		axs[1].imshow(np.abs(cH), cmap='gray')
+		axs[1].set_title(f'Detalhe Horizontal {nivel}')
+		axs[2].imshow(np.abs(cV), cmap='gray')
+		axs[2].set_title(f'Detalhe Vertical {nivel}')
+		axs[3].imshow(np.abs(cD), cmap='gray')
+		axs[3].set_title(f'Detalhe Diagonal {nivel}')
+
+		for ax in axs:
 			ax.axis('off')
 		plt.tight_layout()
 		plt.show()

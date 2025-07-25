@@ -143,16 +143,16 @@ def mostra_residuo(ft_original, frequencia_original, ft_filtrado, componente = "
 	
 def aplica_DTWT_em_sinal(sinal, familia, nivel = None, isImage = False):
 	if isImage:
-		imagem = mil.Wavelet_Image(sinal, familia)
+		imagem = mil.Wavelet_Image(sinal, familia, nivel)
 		return imagem
 
 	else:
 		coeficientes = pywt.wavedec(sinal, wavelet=familia, level=nivel)
 		return coeficientes
 
-def mostra_WT(coeficientes, dt = None, componente = "m", isImage = False):
+def mostra_WT(coeficientes, dt = None, componente = "m", isImage = False, level = None):
 	if isImage:
-		coeficientes.representar_coeficientes()
+		coeficientes.representar_nivel(level)
 
 	else:
 		freq_max = (1 / dt) / 2
@@ -210,14 +210,9 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def main():
-	imagem = le_arquivo_sinal("Imagens//teste.pgm", True)
-	wavelet = aplica_DTWT_em_sinal(imagem, "coif1", isImage=True)
-	mostra_WT(wavelet, isImage=True)
-	imagem_reconstroi = aplica_IDTWT_em_sinal(wavelet, isImage=True)
-	mil.print_grayscale_image(imagem_reconstroi)
-	mil.print_grayscale_image(imagem)
-	are_equal = np.allclose(imagem.pixels, imagem_reconstroi.pixels)
-	print("As matrizes são aproximadamente iguais?", are_equal)
+	imagem = le_arquivo_sinal("Imagens//gourds.pgm", True)
+	wavelet = aplica_DTWT_em_sinal(imagem, "haar", 3, isImage=True)
+	mostra_WT(wavelet, isImage=True, level = 3)
 
 	return 0
 
