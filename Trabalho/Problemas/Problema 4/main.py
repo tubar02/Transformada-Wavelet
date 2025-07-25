@@ -195,7 +195,9 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 
 		elif escolha == "S":
 			if isImage:
-				ul.mostra_WT(coeficientes, isImage = True)
+				print(f"Qual nível da transformada você quer visualizar? (1 a {level})")
+				nivel = int(input())
+				ul.mostra_WT(coeficientes, isImage = True, level=nivel)
 
 			else:
 				print("Como você deseja visualizar seu sinal transformado?\n")
