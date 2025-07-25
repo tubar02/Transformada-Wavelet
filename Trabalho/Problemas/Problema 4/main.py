@@ -134,7 +134,7 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 		return familia, level
 	
 	familia, level = reseta_parametros()
-	coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
+	coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level, isImage)
 
 	def print_parametros():
 		nonlocal familia, level
@@ -171,7 +171,7 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 
 			familia = input("\nDigite sua escolha: ").lower()
 			print_parametros()
-			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
+			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level, isImage)
 
 		elif escolha == "L":
 			print("Você escolheu mudar até que nível sua transformada vai.")
@@ -183,7 +183,7 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 				except:
 					print("\nO nível deve ser um valor inteiro.\n")
 			print_parametros()
-			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
+			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level, isImage)
 
 		elif escolha == "R":
 			print("Você escolheu resetar os parâmetros.")
@@ -191,15 +191,19 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 			print("Os parâmetros foram resetados.")
 			print("\n")
 			print_parametros()
-			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level)
+			coeficientes = ul.aplica_DTWT_em_sinal(sinal, familia, level, isImage)
 
 		elif escolha == "S":
-			print("Como você deseja visualizar seu sinal transformado?\n")
-			print("\tr: Componente real.\ti: Componente imaginária.")
-			print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+			if isImage:
+				ul.mostra_WT(coeficientes, isImage = True)
 
-			escolha = input("Entre com sua escolha: ").lower()
-			ul.mostra_WT(coeficientes, dt, escolha, isImage)
+			else:
+				print("Como você deseja visualizar seu sinal transformado?\n")
+				print("\tr: Componente real.\ti: Componente imaginária.")
+				print("\tri: Componentes real e imaginária.\tm: Módulo.\n")
+
+				escolha = input("Entre com sua escolha: ").lower()
+				ul.mostra_WT(coeficientes, dt, escolha, isImage)
 
 		elif escolha == "P":
 			print("Você escolheu filtrar o sinal transformado.")
