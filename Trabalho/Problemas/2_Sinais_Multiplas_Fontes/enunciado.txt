@@ -1,0 +1,2 @@
+Tendo os códigos desenvolvidos para o problema anterior, implementar uma forma de simular o
+sinal vindo de tantas fontes quanto se queira.

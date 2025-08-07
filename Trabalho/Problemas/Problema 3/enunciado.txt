@@ -1,1 +1,0 @@
-Tendo os códigos desenvolvidos para o problema anterior, ter um programa que aceite tanto sinais unidimensionais, quanto bidimensionais (imagens). Além disso, implementar também uma forma de adicionar ruído gaussiano aos sinais.
