@@ -4,9 +4,7 @@ Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma 
 
 ---
 
-# 📂 Estrutura do Projeto
-
-📁 Documentos Institucionais/              # Relatórios e documentos formais da IC
+📁 Documentos Institucionais/             # Relatórios e documentos formais da IC
 │   ├── 📁 Materiais Produzidos/           # Relatórios e apresentações produzidos
 │   └── 📁 Relatórios/                     # Relatórios detalhados (parte prática e teórica)
 │
@@ -25,11 +23,10 @@ Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma 
 │   │   ├── 📁 3_Sinais_Imagens_Ruido/     # Inclusão de imagens e ruído gaussiano
 │   │   └── 📁 4_Implementacao_Wavelet/    # Wavelet 1D e 2D
 │   │
-│   └── 📁 Processamento_de_Imagens/       # Histórico e recursos da disciplina
-│       ├── 📁 Biblioteca_my_image_lib/    # Versões antigas da biblioteca
-│       ├── 📁 codigos_auxiliares/         # Scripts utilitários
-│       ├── 📁 Materiais_de_apoio/         # Aulas, artigos e atividades
-│       └── 📁 Trabalhos/                  # Trabalhos originais da disciplina
+│   └── 📁 Processamento_de_Imagens/       # Conteúdo da disciplina de Processamento de Imagens
+│       ├── 📁 Biblioteca_my_image_lib/    # Versões de desenvolvimento da biblioteca
+│       ├── 📁 Utilitarios/                 # Scripts úteis para a IC
+│       └── 📁 Historico_Disciplina/        # Trabalhos e materiais originais da disciplina
 │
 📄 requirements.txt                        # Dependências do projeto
 📄 README.md                               # Documentação principal
