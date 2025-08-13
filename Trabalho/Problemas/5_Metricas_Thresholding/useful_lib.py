@@ -198,10 +198,13 @@ def aplica_IDTWT_em_sinal(coeficientes, familia = None, isImage = False):
 		return sinal_rec
 
 def potencia_media(sinal):
-	potencia = 0
-	for valor in sinal:
-		potencia += valor ** 2
-	return potencia / len(sinal)
+	"""
+    Potência média do sinal (1D ou 2D, real ou complexo).
+    Usa |x|^2 para sinais complexos, como em RM.
+    """
+
+	potencia = np.abs(sinal) ** 2
+	return potencia.mean()
 
 def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, isImage = False, outputpath = None):
 	"""
@@ -234,7 +237,7 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 def main():
 	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
 	mostra_sinal(sinal, tempos, "r")
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 3)
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 20)
 	mostra_sinal(ruidoso, tempos, "r")
 
 	return 0
