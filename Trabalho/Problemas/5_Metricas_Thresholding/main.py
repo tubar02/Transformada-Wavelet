@@ -592,6 +592,8 @@ def menu_muda_sinal(sinal, tempos, dt):
 			else:
 				print("\nNão existe nenhum sinal com esse nome.")
 
+		#MENU RUÍDO?????
+
 		elif escolha == "R":
 			print("Você escolheu adicionar ruído gaussiano a um sinal.")
 			print("O ruído gaussiano é gerado a partir de uma função de densidade de probabilidade, definida como: ")
@@ -609,6 +611,13 @@ def menu_muda_sinal(sinal, tempos, dt):
 				ul.salva_sinal(sinal_ruidoso, tempos, nome_salva)
 			
 			print("\nSinal ruidoso criado.")
+
+		elif escolha == "C":
+			print("Você escolheu calcular o SNR do sinal.")
+			original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
+			degradado, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal degradado: "))
+			snr = ul.snr(original, degradado, retorno = "linear")
+			print(f"Esse sinal possui SNR de {snr}")
 
 		elif escolha == "M":
 			print("\n")
@@ -645,7 +654,7 @@ def menu():
 	sinal, tempos, dt = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
 
 	def print_menu():
-		print("Bem-vindo à resolução do Problema 4!") 
+		print("Bem-vindo à resolução do Problema 5!") 
 		print("Escolha sua opção: ")
 		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
 		print("\tF: Trabalha com a FT do sinal.\tW: Trabalha com a WT do sinal.")

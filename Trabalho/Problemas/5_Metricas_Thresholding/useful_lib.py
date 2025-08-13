@@ -214,7 +214,7 @@ def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, 
 	"""
 		
 	if mode == "snr":
-		sigma = sqrt(potencia_media(sinal) / 10 ** (param / 10))
+		sqrt(potencia_media(sinal) / param)
 	else:
 		sigma = param
 
@@ -233,6 +233,29 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		ruido1 = np.random.normal(mu, sigma, len(sinal))
 		ruido2 = np.random.normal(mu, sigma, len(sinal)) * 1j
 		return sinal + ruido1 + ruido2
+
+def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
+    """
+    SNR entre um original e um degradado (ou original e ruído).
+    - original: np.ndarray 1D/2D (real ou complexo)
+    - degradado: original + ruido (se não fornecer 'ruido')
+    - ruido: opcional; se dado, ignora 'degradado'
+    - retorno: "db" (default) ou "linear"
+    """
+    x = np.asarray(original)
+    if ruido is None:
+        assert degradado is not None, "Passe 'degradado' ou 'ruido'."
+        n = np.asarray(degradado) - x
+    else:
+        n = np.asarray(ruido)
+
+    p_sig = potencia_media(x)
+    p_rui = potencia_media(n) + eps  # evita div/0
+
+    snr_lin = p_sig / p_rui
+    if retorno == "db":
+        return 10.0 * np.log10(snr_lin + eps)
+    return snr_lin
 
 def main():
 	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
