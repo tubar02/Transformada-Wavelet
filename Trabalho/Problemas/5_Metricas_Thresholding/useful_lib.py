@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import my_image_lib_0_7 as mil
+import my_image_lib_0_8 as mil
 import pywt
 from copy import deepcopy
 
