@@ -1,6 +1,6 @@
 # 🧠 Transformada Wavelet — Iniciação Científica
 
-Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma Iniciação Científica sobre o uso da Transformada Wavelet no processamento de sinais, com ênfase em aplicações em Ressonância Magnética (RM).
+Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma Iniciação Científica sobre o uso da Transformada Wavelet no processamento de sinais, com ênfase na detecção de bordas em imagens de Ressonância Magnética (RM).
 
 ---
 
@@ -54,32 +54,19 @@ Você poderá escolher/simular sinais, aplicar transformadas (Fourier ou Wavelet
 
 ---
 
-## 📘 Documentação
-
-- Todos os relatórios produzidos estão em [`Documentos_Institucionais/`](./Documentos_Institucionais)
-- A biblioteca wavelet usada no projeto está em [`useful_lib.py`](./useful_lib.py)
-- As versões da biblioteca `my_image_lib` usadas na disciplina estão em [`Trabalho/Processamento_de_Imagens/Biblioteca_my_image_lib`](./Trabalho/Processamento_de_Imagens/Biblioteca_my_image_lib)
-
----
-
-## 📎 Materiais de Estudo
-
-Os materiais teóricos e artigos utilizados durante a pesquisa estão em [`Material/`](./Material/).
-
----
-
 ## 🧠 Objetivos da Pesquisa
 
-> Esta iniciação científica tem como objetivo estudar a aplicação da Transformada Wavelet em sinais simulados e imagens, explorando técnicas de denoising, thresholding e compressão, com foco em sinais de Ressonância Magnética.
+> Esta iniciação científica tem como objetivo estudar a aplicação da Transformada Wavelet em sinais e imagens, explorando técnicas de denoising e thresholding, com foco em sinais de Ressonância Magnética.
 
 ---
 
-## 🧑‍💻 Autor
+## 🧑‍💻 Autor e Orientação
 
-- **Thiago Oliveira dos Santos**  
+- **Autor:** Thiago Oliveira dos Santos  
   Iniciação Científica — Instituto de Física de São Carlos (IFSC-USP)
 
----
+- **Orientador:** Prof. Dr. Fernando Fernandes Paiva 
+  Departamento de Física e Ciência Interdisciplinar — IFSC-USP
 
 ## 📄 Licença
 
