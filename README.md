@@ -3,7 +3,8 @@
 Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma Iniciação Científica sobre o uso da Transformada Wavelet no processamento de sinais, com ênfase na detecção de bordas em imagens de Ressonância Magnética (RM).
 
 ---
-
+## 📦 Organização do Repositório
+```text
 📁 Documentos Institucionais/             # Relatórios e documentos formais da IC
 │   ├── 📁 Materiais Produzidos/           # Relatórios e apresentações produzidos
 │   └── 📁 Relatórios/                     # Relatórios detalhados (parte prática e teórica)
@@ -30,7 +31,7 @@ Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma 
 │
 📄 requirements.txt                        # Dependências do projeto
 📄 README.md                               # Documentação principal
-
+```
 
 ## ⚙️ Requisitos
 
@@ -63,10 +64,10 @@ Você poderá escolher/simular sinais, aplicar transformadas (Fourier ou Wavelet
 ## 🧑‍💻 Autor e Orientação
 
 - **Autor:** Thiago Oliveira dos Santos  
-  Iniciação Científica — Instituto de Física de São Carlos (IFSC-USP)
+- Iniciação Científica —- Instituto de Física de São Carlos (IFSC-USP)
 
 - **Orientador:** Prof. Dr. Fernando Fernandes Paiva 
-  Departamento de Física e Ciência Interdisciplinar — IFSC-USP
+- Departamento de Física e Ciência Interdisciplinar — IFSC-USP
 
 ## 📄 Licença
 
