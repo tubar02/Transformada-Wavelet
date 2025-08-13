@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import my_image_lib_0_7 as mil
+import my_image_lib_0_8 as mil
 import pywt
+from math import sqrt
 from copy import deepcopy
 
 #inicialização dos dados
@@ -196,6 +197,27 @@ def aplica_IDTWT_em_sinal(coeficientes, familia = None, isImage = False):
 		sinal_rec = pywt.waverec(coeficientes, wavelet=familia)
 		return sinal_rec
 
+def potencia_media(sinal):
+	potencia = 0
+	for valor in sinal:
+		potencia += valor ** 2
+	return potencia / len(sinal)
+
+def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, isImage = False, outputpath = None):
+	"""
+	noise_type: "gaussian", "salt_pepper", "poisson", etc.
+	mode: "sigma" ou "snr"
+	param: sigma (se mode="sigma") ou snr_db (se mode="snr")
+	"""
+		
+	if mode == "snr":
+		sigma = sqrt(potencia_media(sinal) / 10 ** (param / 10))
+	else:
+		sigma = param
+
+	if noise_type == "gaussian":
+		return adiciona_ruido_gauss(sinal, 0, sigma, isImage, outputpath)
+
 def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 	if isImage:
 		ruido = mil.Ruido(_sinal)
@@ -210,9 +232,10 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def main():
-	imagem = le_arquivo_sinal("Imagens//gourds.pgm", True)
-	wavelet = aplica_DTWT_em_sinal(imagem, "haar", 3, isImage=True)
-	mostra_WT(wavelet, isImage=True, level = 3)
+	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
+	mostra_sinal(sinal, tempos, "r")
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 3)
+	mostra_sinal(ruidoso, tempos, "r")
 
 	return 0
 
