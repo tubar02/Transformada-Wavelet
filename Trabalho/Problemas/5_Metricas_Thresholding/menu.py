@@ -1,12 +1,37 @@
-# menu.py
+# Módulos nativos do python
+from dataclasses import dataclass # Para facilitar o manuseio dos parâmetros
+from pathlib import Path 
+
+import numpy as np
+
+import useful_lib as ul
+import my_image_lib_0_8 as mil
+
+@dataclass
+class AppState:
+	nome_sinal: str = "std"
+	isImage: bool = False
+	sinal: np.ndarray | mil.Image = None
+	tempos: np.ndarray | None = None
+	dt: float | None = None
+	salvou: bool = True
+
+	def __post_init__(self):
+		if self.nome_sinal == "std":
+			caminho = Path(f'Sinais/{self.nome_sinal}.txt')
+			self.sinal, self.tempos, self.dt = ul.le_arquivo_sinal(caminho)
+
 class MenuBase:
-	def __init__(self, parent=None):
-		self.parent = parent  # Referência ao menu pai (None para o menu principal)
+	def __init__(self, parent=None, state=None):
+		self.parent = parent
+		self.state = state
 		self.rodando = True
+		self.opcoes = {}  # "tecla": ("Descrição", função)
 
 	def exibir(self):
-		"""Exibe as opções do menu. (Deve ser implementado pelas subclasses)"""
-		pass
+		# cada filho pode sobrescrever o cabeçalho, mas aqui listamos as opções
+		for k, (desc, _) in self.opcoes.items():
+			print(f"[{k}] {desc}")
 
 	def processar_escolha(self, escolha):
 		"""Trata a escolha do usuário. Retorna um sinal se for para sair."""
@@ -73,5 +98,5 @@ class WaveletMenu(MenuBase):
 			print("Opção inválida! Tente novamente.")
 
 if __name__ == "__main__":
-	menu = MainMenu()
-	menu.run()  # Inicia o menu principal
+	appstate = AppState()
+	print(appstate)
