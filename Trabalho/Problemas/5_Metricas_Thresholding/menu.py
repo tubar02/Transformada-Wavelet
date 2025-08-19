@@ -16,11 +16,6 @@ class AppState:
 	dt: float | None = None
 	salvou: bool = True
 
-	def __post_init__(self):
-		if self.nome_sinal == "std":
-			caminho = Path(f'Sinais/{self.nome_sinal}.txt')
-			self.sinal, self.tempos, self.dt = ul.le_arquivo_sinal(caminho)
-
 class MenuBase:
 	def __init__(self, parent=None, state=None):
 		self.parent = parent
