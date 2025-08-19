@@ -1,4 +1,5 @@
 def pause(printa = "\n[Enter] para continuar..."):
+	"""Pausa o fluxo do programa para receber uma entrada que não será usada."""
 	try:
 		lixo = input(printa)
 	except EOFError:
