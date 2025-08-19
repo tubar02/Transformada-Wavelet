@@ -1,4 +1,4 @@
-# 🧠 Transformada Wavelet — Iniciação Científica
+# 🖥️ Processamento de Imagens por Ressonância Magnética utilizando Transformada Wavelet — Iniciação Científica
 
 Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma Iniciação Científica sobre o uso da Transformada Wavelet no processamento de sinais, com ênfase na detecção de bordas em imagens de Ressonância Magnética (RM).
 
@@ -31,6 +31,7 @@ Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma 
 │
 📄 requirements.txt                        # Dependências do projeto
 📄 README.md                               # Documentação principal
+🗝️ LICENSE								    # Licença
 ```
 
 ## ⚙️ Requisitos
