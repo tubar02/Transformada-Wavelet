@@ -29,16 +29,21 @@ class MenuBase:
 		# cada filho pode sobrescrever o cabeçalho, mas aqui listamos as opções
 		for k, (desc, _) in self.opcoes.items():
 			print(f"[{k}] {desc}")
+			print("\n")
 
 	def processar_escolha(self, escolha):
-		"""Trata a escolha do usuário. Retorna um sinal se for para sair."""
-		pass
+		"""Trata a escolha do usuário. Retorna "SAIR" se for para sair."""
+		_, handler = self.opcoes[escolha]
+		return handler()
 
 	def run(self):
 		"""Loop principal do menu: exibe, lê entrada e processa até sinalizar saída."""
+
+		opcoes_validas = [i[0] for i in self.opcoes.items()]
+
 		while self.rodando:
 			self.exibir()  # Mostra o menu atual
-			escolha = input("Selecione uma opção: ")
+			escolha = cli.faz_escolha("Digite sua escolha: ", opcoes_validas)
 			resultado = self.processar_escolha(escolha)
 			if resultado == "SAIR":  
 				# Se o submenu solicitou sair/voltar
@@ -46,30 +51,18 @@ class MenuBase:
 		# Fim do loop: se houver pai, retorno ao menu pai; se não, programa termina.
 
 class MainMenu(MenuBase):
-	def __init__(self):
-		super().__init__(parent=None)  # Menu principal não tem pai
-		self.titulo = "Menu Principal"
+	def __init__(self, state):
+		super().__init__(None, state)  # Menu principal não tem pai
+		self.titulo = "Problema 5 - Menu Principal"
+		self.opcoes = {"X": ("Encerra o programa.", self.sair)}
 
 	def exibir(self):
-		print(f"=== {self.titulo} ===")
-		print("1. Menu de Processamento Wavelet")
-		print("2. Outra funcionalidade")
-		print("0. Sair")
+		print(12 * "==" + " " + self.titulo + " " + 12 * "==" + "\n\n")
+		super().exibir()
 
-	def processar_escolha(self, escolha):
-		if escolha == "1":
-			submenu = WaveletMenu(parent=self)
-			submenu.run()            # Entra no submenu de wavelet
-			# Ao retornar, o loop deste MainMenu continua
-		elif escolha == "2":
-			pass
-			# executar_outra_funcionalidade()
-		elif escolha == "0":
-			print("Encerrando o programa...")
-			return "SAIR"            # Sinaliza para sair do loop do menu principal
-		else:
-			print("Opção inválida! Tente novamente.")
-
+	def sair(self):
+		return "SAIR"
+		
 class WaveletMenu(MenuBase):
 	def __init__(self, parent):
 		super().__init__(parent)
@@ -95,5 +88,6 @@ class WaveletMenu(MenuBase):
 			print("Opção inválida! Tente novamente.")
 
 if __name__ == "__main__":
-	appstate = AppState()
-	print(appstate)
+	state = AppState()
+	menu = MainMenu(state)
+	menu.run()
