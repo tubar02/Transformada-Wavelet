@@ -642,10 +642,10 @@ def menu_muda_sinal(sinal, tempos, dt):
 def menu():
 	global nome_sinal
 
-	sinal, tempos, dt = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
+	sinal, tempos, dt, n_pontos = ul.le_arquivo_sinal(f"Sinais/{nome_sinal}.txt")
 
 	def print_menu():
-		print("Bem-vindo à resolução do Problema 4!") 
+		print("Bem-vindo à resolução do Problema 5!") 
 		print("Escolha sua opção: ")
 		print("\tS: Mostra o sinal gerado.\tP: Modifica os sinais.")
 		print("\tF: Trabalha com a FT do sinal.\tW: Trabalha com a WT do sinal.")

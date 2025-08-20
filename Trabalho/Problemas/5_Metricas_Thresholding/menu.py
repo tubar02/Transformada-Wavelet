@@ -1,8 +1,10 @@
 # Módulos nativos do python
 from dataclasses import dataclass # Para facilitar o manuseio dos parâmetros
-from pathlib import Path 
 
 import numpy as np
+
+import numpy.typing as npt
+from typing import Callable
 
 import useful_lib as ul
 import my_image_lib_0_8 as mil
@@ -10,28 +12,31 @@ import cli_helpers as cli
 import io_helpers as io
 
 @dataclass
-class AppState:
+class Sinal:
 	nome_sinal: str = "std"
 	isImage: bool = False
 	sinal: np.ndarray | mil.Image = None
 	tempos: np.ndarray | None = None
 	dt: float | None = None
+	n_pontos: int = None
 	salvou: bool = True
 
 class MenuBase:
-	def __init__(self, parent=None, state=None):
+	pass
+class MenuBase:
+	def __init__(self, parent: MenuBase = None, estado: Sinal = None):
 		self.parent = parent
-		self.state = state
-		self.rodando = True
+		self.state = estado
+		self.rodando: bool = True
 		self.opcoes = {}  # "tecla": ("Descrição", função)
 
 	def exibir(self):
 		# cada filho pode sobrescrever o cabeçalho, mas aqui listamos as opções
 		for k, (desc, _) in self.opcoes.items():
 			print(f"[{k}] {desc}")
-			print("\n")
+		print("\n")
 
-	def processar_escolha(self, escolha):
+	def processar_escolha(self, escolha: str) -> Callable:
 		"""Trata a escolha do usuário. Retorna "SAIR" se for para sair."""
 		_, handler = self.opcoes[escolha]
 		return handler()
@@ -50,44 +55,39 @@ class MenuBase:
 				self.rodando = False
 		# Fim do loop: se houver pai, retorno ao menu pai; se não, programa termina.
 
+	#---- handlers ----
+	def sair(self):
+		return "SAIR"
+
 class MainMenu(MenuBase):
-	def __init__(self, state):
-		super().__init__(None, state)  # Menu principal não tem pai
+	def __init__(self, estado: Sinal):
+		super().__init__(None, estado)  # Menu principal não tem pai
 		self.titulo = "Problema 5 - Menu Principal"
-		self.opcoes = {"X": ("Encerra o programa.", self.sair)}
+		self.opcoes = {"P": ("Gerenciar sinais.", self.gerenciar),
+			"X": ("Encerrar o programa.", self.sair)}
 
 	def exibir(self):
 		print(12 * "==" + " " + self.titulo + " " + 12 * "==" + "\n\n")
 		super().exibir()
 
-	def sair(self):
-		return "SAIR"
-		
-class WaveletMenu(MenuBase):
-	def __init__(self, parent):
-		super().__init__(parent)
-		self.titulo = "Menu de Processamento Wavelet"
+	#---- handlers ----
+	def gerenciar(self):
+		gerenciador = ManagerMenu(self, self.state)
+		gerenciador.run()
+
+class ManagerMenu(MenuBase):
+	def __init__(self, parent, estado):
+		super().__init__(parent, estado)
+		self.titulo = "Menu de Gerenciamento de Sinais"
+		self.opcoes = {"X": ("Sair do menu.", self.sair)}
 
 	def exibir(self):
-		print(f"=== {self.titulo} ===")
-		print("1. Aplicar transformada Wavelet na imagem X")
-		print("2. Aplicar transformada Wavelet na imagem Y")
-		print("0. Voltar")
+		print(12 * "==" + " " + self.titulo + " " + 12 * "==" + "\n\n")
+		super().exibir()
 
-	def processar_escolha(self, escolha):
-		if escolha == "1":
-			pass
-			# aplicar_wavelet_imagem_x()   # Chamada da função de processamento correspondente
-		elif escolha == "2":
-			pass
-			# aplicar_wavelet_imagem_y()
-		elif escolha == "0":
-			print("Retornando ao menu anterior...")
-			return "SAIR"                # Sinaliza para encerrar este menu (voltar)
-		else:
-			print("Opção inválida! Tente novamente.")
-
+	#---- handlers ----
+	
 if __name__ == "__main__":
-	state = AppState()
-	menu = MainMenu(state)
+	sinal_selecionado = Sinal()
+	menu = MainMenu(sinal_selecionado)
 	menu.run()
