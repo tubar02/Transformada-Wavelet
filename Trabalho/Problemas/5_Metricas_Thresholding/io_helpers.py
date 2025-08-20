@@ -57,6 +57,16 @@ def checa_arquivo(nome_sinal: str, extensao: str, isImage: bool):
 	caminho = diretorio / (nome_sinal + extensao)
 	return caminho.exists(), caminho
 
+def deleta_arquivo(nome_sinal: str, extensao: str, isImage: bool):
+	"""Deleta um arquivo."""
+	if isImage: 
+		diretorio = DIR_IMAGENS
+	else:
+		diretorio = DIR_SINAIS
+
+	caminho = diretorio / (nome_sinal + extensao)
+	caminho.unlink()
+
 def main():
 	print(carrega_sinal)
 

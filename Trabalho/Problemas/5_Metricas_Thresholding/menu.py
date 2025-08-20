@@ -85,6 +85,7 @@ class ManagerMenu(MenuBase):
 		self.titulo = "Menu de Gerenciamento de Sinais"
 		self.opcoes = {"L": ("Listar sinais.", self.listar),
 			"F": ("Selecionar sinal.", self.focar),
+			"D": ("Deletar sinal.", self.deletar),
 			"X": ("Sair do menu.", self.sair)}
 
 	def exibir(self):
@@ -124,6 +125,21 @@ class ManagerMenu(MenuBase):
 			self.state.nome_sinal = nome_foca
 		else:
 			print("\nNão existe nenhum sinal com esse nome.")
+
+	def deletar(self):
+		deleta_img = cli.sim_ou_nao("O sinal que você deseja deletar é uma imagem?")
+		nome_apaga = input("Digite o nome do sinal que deseja excluir: ")
+
+		extensao = ".pgm"
+		if deleta_img:
+			extensao = ".pgm"
+
+		existe, caminho = io.checa_arquivo(nome_apaga, extensao, deleta_img)
+
+		if not existe:
+			print("\nNão existe nenhum sinal com esse nome.")
+		else:
+			io.deleta_arquivo(nome_apaga, extensao, deleta_img)
 
 if __name__ == "__main__":
 	sinal_selecionado = Sinal()
