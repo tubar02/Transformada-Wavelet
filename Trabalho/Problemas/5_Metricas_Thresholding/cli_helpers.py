@@ -13,7 +13,7 @@ def faz_escolha(pergunta: str, escolhas: list[str]) -> str:
 		if escolha in escolhas:
 			return escolha
 		
-		print(f"Opção inválida. Válidas: {' | '.join(escolhas)}")
+		print(f"\nOpção inválida. Válidas: {' | '.join(escolhas)}\n")
 
 def pede_inteiro(pergunta: str, min: None | int = None, max: None | int = None) -> int:
 	"""Lê e retorna um inteiro, a partir de uma pergunta para o usuário."""

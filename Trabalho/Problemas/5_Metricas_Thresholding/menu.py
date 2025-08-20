@@ -49,7 +49,9 @@ class MenuBase:
 		while self.rodando:
 			self.exibir()  # Mostra o menu atual
 			escolha = cli.faz_escolha("Digite sua escolha: ", opcoes_validas)
+			print("\n")
 			resultado = self.processar_escolha(escolha)
+			print("\n")
 			if resultado == "SAIR":  
 				# Se o submenu solicitou sair/voltar
 				self.rodando = False
@@ -57,7 +59,9 @@ class MenuBase:
 
 	#---- handlers ----
 	def sair(self):
-		return "SAIR"
+		sai = cli.faz_escolha("Deseja mesmo sair? (Y/N): ", ["Y", "N"])
+		if sai == "Y":
+			return "SAIR"
 
 class MainMenu(MenuBase):
 	def __init__(self, estado: Sinal):
@@ -79,13 +83,30 @@ class ManagerMenu(MenuBase):
 	def __init__(self, parent, estado):
 		super().__init__(parent, estado)
 		self.titulo = "Menu de Gerenciamento de Sinais"
-		self.opcoes = {"X": ("Sair do menu.", self.sair)}
+		self.opcoes = {"L": ("Listar sinais.", self.listar),
+			"X": ("Sair do menu.", self.sair)}
 
 	def exibir(self):
 		print(12 * "==" + " " + self.titulo + " " + 12 * "==" + "\n\n")
 		super().exibir()
 
 	#---- handlers ----
+	def listar(self):
+		print("Sinais\n")
+		sinais_sort = io.lista_sinais()
+		for nome in sinais_sort:
+			if nome == self.state.nome_sinal and not self.state.isImage:
+				print(f"\t--> {nome} <--")
+			else:
+				print(f"\t{nome}")
+
+		print("Imagens\n")
+		sinais_sort = io.lista_sinais(".pgm", True)
+		for nome in sinais_sort:
+			if nome == self.state.nome_sinal and self.state.isImage:
+				print(f"\t--> {nome} <--")
+			else:
+				print(f"\t{nome}")
 	
 if __name__ == "__main__":
 	sinal_selecionado = Sinal()
