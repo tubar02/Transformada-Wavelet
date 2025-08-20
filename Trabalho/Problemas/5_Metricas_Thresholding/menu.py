@@ -13,13 +13,27 @@ import io_helpers as io
 
 @dataclass
 class Sinal:
-	nome_sinal: str = "std"
+	nome_sinal: str = None
 	isImage: bool = False
 	sinal: np.ndarray | mil.Image = None
 	tempos: np.ndarray | None = None
 	dt: float | None = None
 	n_pontos: int = None
 	salvou: bool = True
+
+	# buffer de construção (só usada no builder)
+	build_sinal: np.ndarray | None = None
+	build_tempos: np.ndarray | None = None
+	build_dt: float | None = None
+	build_n_pontos: int = None
+	build_components: list = None  # histórico de componentes adicionados
+
+	def reset_build(self):
+		self.build_sinal = None
+		self.build_tempos = None
+		self.build_dt = None
+		self.build_n_pontos = None
+		self.build_components = []
 
 class MenuBase:
 	pass
@@ -29,9 +43,12 @@ class MenuBase:
 		self.state = estado
 		self.rodando: bool = True
 		self.opcoes = {}  # "tecla": ("Descrição", função)
+		self.titulo = ""
 
 	def exibir(self):
-		# cada filho pode sobrescrever o cabeçalho, mas aqui listamos as opções
+		print(12 * "==" + " " + self.titulo + " " + 12 * "==" + "\n\n")
+		if self.state.sinal is not None:
+			print(f"Sinal selecionado: {self.state.nome_sinal}\n")
 		for k, (desc, _) in self.opcoes.items():
 			print(f"[{k}] {desc}")
 		print("\n")
@@ -67,14 +84,25 @@ class MainMenu(MenuBase):
 	def __init__(self, estado: Sinal):
 		super().__init__(None, estado)  # Menu principal não tem pai
 		self.titulo = "Problema 5 - Menu Principal"
-		self.opcoes = {"P": ("Gerenciar sinais.", self.gerenciar),
+		self.opcoes = {"S": ("Mostrar sinal selecionado.", self.mostrar),
+			"P": ("Gerenciar sinais.", self.gerenciar),
 			"X": ("Encerrar o programa.", self.sair)}
 
-	def exibir(self):
-		print(12 * "==" + " " + self.titulo + " " + 12 * "==" + "\n\n")
-		super().exibir()
-
 	#---- handlers ----
+	def mostrar(self):
+		if self.state.nome_sinal == None:
+			print("Nenhum sinal selecionado.")
+			return
+		
+		componente = ""
+		if not self.state.isImage:
+			pergunta = "Como você deseja visualizar seu sinal?\n"
+			pergunta += "\tR: Componente real.\tI: Componente imaginária."
+			pergunta += "\tRI: Componentes real e imaginária.\tM: Módulo.\n"
+			componente = cli.faz_escolha(pergunta, ["R", "I", "RI", "M"])
+
+		ul.mostra_sinal(self.state.sinal, self.state.tempos, componente, self.state.isImage)
+
 	def gerenciar(self):
 		gerenciador = ManagerMenu(self, self.state)
 		gerenciador.run()
@@ -86,11 +114,8 @@ class ManagerMenu(MenuBase):
 		self.opcoes = {"L": ("Listar sinais.", self.listar),
 			"F": ("Selecionar sinal.", self.focar),
 			"D": ("Deletar sinal.", self.deletar),
+			"N": ("Criar novo sinal (1D).", self.criar),
 			"X": ("Sair do menu.", self.sair)}
-
-	def exibir(self):
-		print(12 * "==" + " " + self.titulo + " " + 12 * "==" + "\n\n")
-		super().exibir()
 
 	#---- handlers ----
 	def listar(self):
@@ -140,6 +165,23 @@ class ManagerMenu(MenuBase):
 			print("\nNão existe nenhum sinal com esse nome.")
 		else:
 			io.deleta_arquivo(nome_apaga, extensao, deleta_img)
+
+	def criar(self):
+		criador = BuilderMenu(self, self.state)
+		criador.run()
+
+class BuilderMenu(MenuBase):
+	def __init__(self, parent: ManagerMenu, estado: Sinal):
+		super().__init__(parent, estado)
+		self.titulo = "Menu de Criação de Sinais"
+		self.opcoes = {"P": ("Preview do sinal montado.", self.preview),
+			"X": ("Sair do menu.", self.sair)}
+
+	#---- handlers ----
+	def preview(self):
+		if self.state.build_sinal == None:
+			print("Nenhum sinal criado.")
+			return
 
 if __name__ == "__main__":
 	sinal_selecionado = Sinal()

@@ -46,15 +46,14 @@ def mostra_sinal(sinal, tempo = None, componente = None, isImage = False):
 	if isImage:
 		mil.print_grayscale_image(sinal)
 	else:
-		assert componente in "rim", "Uso errado do parâmetro \'componente\'.\n Use \'r\' para mostrar a parte real do sinal.\n Use \'i\' para mostrar a parte imaginária do sinal.\n Use \'ri\' para mostrar a parte real e a parte imaginária do sinal.\n Use \'m\' para mostrar o módulo do sinal." 
-		if componente == "r": 
+		if componente == "R": 
 			plt.plot(tempo, sinal.real, label="Parte real")
-		elif componente == "i":
+		elif componente == "I":
 			plt.plot(tempo, sinal.imag, label="Parte imaginária")
-		elif componente == "ri":
+		elif componente == "RI":
 			plt.plot(tempo, sinal.real, label="Parte real")
 			plt.plot(tempo, sinal.imag, label="Parte imaginária")
-		elif componente == "m":
+		elif componente == "M":
 			plt.plot(tempo, np.abs(sinal), label="Módulo")
 			
 		plt.xlabel("Tempo (s)")
