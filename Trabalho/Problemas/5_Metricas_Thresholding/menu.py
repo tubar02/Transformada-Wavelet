@@ -59,8 +59,8 @@ class MenuBase:
 
 	#---- handlers ----
 	def sair(self):
-		sai = cli.faz_escolha("Deseja mesmo sair? (Y/N): ", ["Y", "N"])
-		if sai == "Y":
+		sai = cli.sim_ou_nao("Deseja mesmo sair?")
+		if sai:
 			return "SAIR"
 
 class MainMenu(MenuBase):
@@ -80,10 +80,11 @@ class MainMenu(MenuBase):
 		gerenciador.run()
 
 class ManagerMenu(MenuBase):
-	def __init__(self, parent, estado):
+	def __init__(self, parent: MainMenu, estado: Sinal):
 		super().__init__(parent, estado)
 		self.titulo = "Menu de Gerenciamento de Sinais"
 		self.opcoes = {"L": ("Listar sinais.", self.listar),
+			"F": ("Selecionar sinal.", self.focar),
 			"X": ("Sair do menu.", self.sair)}
 
 	def exibir(self):
@@ -108,6 +109,22 @@ class ManagerMenu(MenuBase):
 			else:
 				print(f"\t{nome}")
 	
+	def focar(self):
+		self.state.isImage = cli.sim_ou_nao("Seu sinal é uma imagem?")
+		nome_foca = input("\nDigite o nome do sinal que deseja analisar: ")
+
+		extensao = ".txt"
+		if self.state.isImage:
+			extensao = ".pgm"
+
+		existe, caminho = io.checa_arquivo(nome_foca, extensao, self.state.isImage)
+
+		if existe:
+			self.state.sinal, self.state.tempos, self.state.dt, self.state.n_pontos = ul.le_arquivo_sinal(caminho, self.state.isImage)
+			self.state.nome_sinal = nome_foca
+		else:
+			print("\nNão existe nenhum sinal com esse nome.")
+
 if __name__ == "__main__":
 	sinal_selecionado = Sinal()
 	menu = MainMenu(sinal_selecionado)

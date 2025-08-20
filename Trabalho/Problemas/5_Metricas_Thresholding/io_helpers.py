@@ -47,6 +47,16 @@ def lista_sinais(extensao = ".txt", isImage = False) -> list[str]:
 	organizado = [str(i) for i in sorted(nome.stem for nome in arquivos)] # Organiza os nomes dos arquivos em ordem alfabética, cortando a extensão
 	return organizado
 
+def checa_arquivo(nome_sinal: str, extensao: str, isImage: bool):
+	"""Checa a existência de um arquivo."""
+	if isImage: 
+		diretorio = DIR_IMAGENS
+	else:
+		diretorio = DIR_SINAIS
+
+	caminho = diretorio / (nome_sinal + extensao)
+	return caminho.exists(), caminho
+
 def main():
 	print(carrega_sinal)
 

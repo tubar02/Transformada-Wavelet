@@ -15,7 +15,7 @@ with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros
 def le_arquivo_sinal(caminho_arq, isImage = False):
 	if isImage:
 		sinal = mil.Image(f"{caminho_arq}")
-		return sinal
+		return sinal, None, None, None
 
 	else:
 		with open(f"{caminho_arq}", "r") as arquivo_sinal:
