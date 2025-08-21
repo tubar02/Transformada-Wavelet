@@ -257,6 +257,15 @@ def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
         return 10.0 * np.log10(snr_lin + eps)
     return snr_lin
 
+def estima_snr_wavelet(sinal_ruidoso_coeficientes, original):
+	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1])) / 0.6745
+	snr_db = 10 * np.log10(potencia_media(original) / (2 * (sigma** 2)))
+	return snr_db
+
+def visu_shrink(sinal_ruidoso, sinal_original = None):
+	if sinal_original is not None:
+		pass
+
 def main():
 	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
 	mostra_sinal(sinal, tempos, "r")
@@ -264,6 +273,12 @@ def main():
 	mostra_sinal(ruidoso, tempos, "r")
 
 	snr_db = snr(sinal, ruidoso)
+	print(snr_db)
+
+	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 2)
+	mostra_WT(transformado, dt)
+
+	snr_db = estima_snr_wavelet(transformado, sinal)
 	print(snr_db)
 
 	return 0
