@@ -208,28 +208,31 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 				ul.mostra_WT(coeficientes, dt, escolha, isImage)
 
 		elif escolha == "P":
-			print("Você escolheu filtrar o sinal transformado.")
-			print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
-
-			tamanho = len(sinal)
-
-			print(f"Seu sinal original possui {tamanho} pontos.\n")
-
-			if level == 1:
-				entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
+			if isImage:
+				pass
 			else:
-				entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
+				print("Você escolheu filtrar o sinal transformado.")
+				print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
 
-			nivel = int(input(entrada))
+				tamanho = len(sinal)
 
-			if nivel != 0:
-				nivel = nivel * (-1)
+				print(f"Seu sinal original possui {tamanho} pontos.\n")
 
-			indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
-			
-			coeficientes[nivel][indice::] = 0
+				if level == 1:
+					entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
+				else:
+					entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
 
-			print("\nSeu sinal foi filtrado.")
+				nivel = int(input(entrada))
+
+				if nivel != 0:
+					nivel = nivel * (-1)
+
+				indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
+				
+				coeficientes[nivel][indice::] = 0
+
+				print("\nSeu sinal foi filtrado.")
 
 		elif escolha == "I":
 			print("Você escolheu salvar a IDTWT em um arquivo.")

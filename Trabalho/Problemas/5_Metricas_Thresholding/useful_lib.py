@@ -214,7 +214,7 @@ def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, 
 	"""
 		
 	if mode == "snr":
-		sqrt(potencia_media(sinal) / param)
+		sigma = sqrt(potencia_media(sinal) / (2 * 10 ** (param / 10)))
 	else:
 		sigma = param
 
@@ -260,8 +260,11 @@ def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
 def main():
 	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
 	mostra_sinal(sinal, tempos, "r")
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 20)
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 10)
 	mostra_sinal(ruidoso, tempos, "r")
+
+	snr_db = snr(sinal, ruidoso)
+	print(snr_db)
 
 	return 0
 
