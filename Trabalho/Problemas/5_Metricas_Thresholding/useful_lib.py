@@ -235,36 +235,51 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		return sinal + ruido1 + ruido2
 
 def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
-    """
-    SNR entre um original e um degradado (ou original e ruído).
-    - original: np.ndarray 1D/2D (real ou complexo)
-    - degradado: original + ruido (se não fornecer 'ruido')
-    - ruido: opcional; se dado, ignora 'degradado'
-    - retorno: "db" (default) ou "linear"
-    """
-    x = np.asarray(original)
-    if ruido is None:
-        assert degradado is not None, "Passe 'degradado' ou 'ruido'."
-        n = np.asarray(degradado) - x
-    else:
-        n = np.asarray(ruido)
+	"""
+	SNR entre um original e um degradado (ou original e ruído).
+	- original: np.ndarray 1D/2D (real ou complexo)
+	- degradado: original + ruido (se não fornecer 'ruido')
+	- ruido: opcional; se dado, ignora 'degradado'
+	- retorno: "db" (default), "linear" ou "sigma"
+	"""
+	x = np.asarray(original)
+	if ruido is None:
+		assert degradado is not None, "Passe 'degradado' ou 'ruido'."
+		n = np.asarray(degradado) - x
+	else:
+		n = np.asarray(ruido)
 
-    p_sig = potencia_media(x)
-    p_rui = potencia_media(n) + eps  # evita div/0
+	p_sig = potencia_media(x)
+	p_rui = potencia_media(n) + eps  # evita div/0
 
-    snr_lin = p_sig / p_rui
-    if retorno == "db":
-        return 10.0 * np.log10(snr_lin + eps)
-    return snr_lin
+	snr_lin = p_sig / p_rui
+	if retorno == "db":
+		return 10.0 * np.log10(snr_lin + eps)
+	elif retorno == "sigma":
+		sigma = np.sqrt(p_rui / 2.0)
+		print(f"sigma em snr: {sigma}")
+		return sigma
+	return snr_lin
 
 def estima_snr_wavelet(sinal_ruidoso_coeficientes, original):
 	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1])) / 0.6745
-	snr_db = 10 * np.log10(potencia_media(original) / (2 * (sigma** 2)))
+	print(f"sigma em estima_snr_wavelet: {sigma}")
+	snr_db = 10 * np.log10(potencia_media(original) / ((sigma ** 2)))
 	return snr_db
 
-def visu_shrink(sinal_ruidoso, sinal_original = None):
-	if sinal_original is not None:
-		pass
+def visu_shrink(sinal_ruidoso, sinal_original = None): 
+	if sinal_original is not None: 
+		sigma = snr(sinal_original, sinal_ruidoso, retorno = "sigma") 
+		print(f"sigma em visu_shrink: {sigma}") 
+		limiar = sigma * sqrt(2 * np.log(sinal_original.size)) 
+		return limiar
+
+def hard_thresholding(coeficientes, limiar): 
+	novos_coefs = [coeficientes[0]]
+	for lista in coeficientes[1::]: 
+		lista = np.asarray([i if np.abs(i) >= limiar else 0 for i in lista ]) 
+		novos_coefs.append(lista) 
+	return novos_coefs
 
 def main():
 	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
@@ -275,11 +290,22 @@ def main():
 	snr_db = snr(sinal, ruidoso)
 	print(snr_db)
 
-	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 2)
+	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 4)
 	mostra_WT(transformado, dt)
 
 	snr_db = estima_snr_wavelet(transformado, sinal)
 	print(snr_db)
+
+	limiar = visu_shrink(ruidoso, sinal) 
+	print(limiar) 
+	transf_n_linear = hard_thresholding(transformado, limiar) 
+	mostra_WT(transf_n_linear, dt, "i") 
+
+	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2") 
+	mostra_sinal(reconstroi, tempos, "r")
+
+	db = snr(sinal, reconstroi)
+	print(db)
 
 	return 0
 
