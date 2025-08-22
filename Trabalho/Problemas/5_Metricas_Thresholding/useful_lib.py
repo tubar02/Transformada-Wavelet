@@ -206,6 +206,34 @@ def potencia_media(sinal):
 	potencia = np.abs(sinal) ** 2
 	return potencia.mean()
 
+def converte_snr(snr, saida = "db"):
+	if saida == "db":
+		snr_db = 10 * np.log10(snr)
+		return snr_db
+	elif saida == "lin":
+		snr_lin = 10 ** (snr / 10)
+		return snr_lin
+
+def sigma_gauss(componente_ruido_gauss = None, sinal = None, snr_db = None):
+	if snr_db != None:
+		sigma = sqrt(potencia_media(sinal) / converte_snr(snr_db, "lin"))
+	else:
+		sigma = sqrt(potencia_media(componente_ruido_gauss))
+	return sigma
+
+def sigma_rayleigh(mod_ruido_gauss_complex = None, sinal = None, snr_db = None):
+	if snr_db != None:
+		sigma = sqrt(potencia_media(sinal) / (2 *converte_snr(snr_db, "lin")))
+	else:
+		sigma = sqrt(potencia_media(mod_ruido_gauss_complex) / 2)
+	return sigma
+
+def sigma_rician(mod_degradado_gauss, original):
+	potencia_sinal = potencia_media(original)
+	potencia_degrado = potencia_media(mod_degradado_gauss)
+	sigma = sqrt((potencia_degrado - potencia_sinal) / 2)
+	return sigma
+
 def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, isImage = False, outputpath = None):
 	"""
 	noise_type: "gaussian", "salt_pepper", "poisson", etc.
@@ -214,7 +242,8 @@ def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, 
 	"""
 		
 	if mode == "snr":
-		sigma = sqrt(potencia_media(sinal) / (2 * 10 ** (param / 10)))
+		sigma = sigma_rayleigh(snr_db = param, sinal = sinal)
+		print(f"sigma dentro de adiciona_ruido = {sigma}")
 	else:
 		sigma = param
 
@@ -242,35 +271,34 @@ def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
 	- ruido: opcional; se dado, ignora 'degradado'
 	- retorno: "db" (default), "linear" ou "sigma"
 	"""
-	x = np.asarray(original)
 	if ruido is None:
 		assert degradado is not None, "Passe 'degradado' ou 'ruido'."
-		n = np.asarray(degradado) - x
+		ruido_gauss = degradado - original
 	else:
-		n = np.asarray(ruido)
+		ruido_gauss = ruido
 
-	p_sig = potencia_media(x)
-	p_rui = potencia_media(n) + eps  # evita div/0
+	p_sig = potencia_media(original)
+	p_rui = potencia_media(ruido_gauss) + eps  # evita div/0
 
 	snr_lin = p_sig / p_rui
 	if retorno == "db":
-		return 10.0 * np.log10(snr_lin + eps)
+		return converte_snr(snr_lin)
 	elif retorno == "sigma":
-		sigma = np.sqrt(p_rui / 2.0)
+		sigma = sigma_gauss(ruido_gauss.real)
 		print(f"sigma em snr: {sigma}")
 		return sigma
 	return snr_lin
 
-def estima_snr_wavelet(sinal_ruidoso_coeficientes, original):
-	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1])) / 0.6745
+def estima_snr_wavelet(sinal_ruidoso_coeficientes, original, ponto):
+	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1][ponto::])) / (1.17741)
 	print(f"sigma em estima_snr_wavelet: {sigma}")
-	snr_db = 10 * np.log10(potencia_media(original) / ((sigma ** 2)))
+	snr_lin = potencia_media(original) / (2 * sigma ** 2)
+	snr_db = converte_snr(snr_lin)
 	return snr_db
 
 def visu_shrink(sinal_ruidoso, sinal_original = None): 
 	if sinal_original is not None: 
 		sigma = snr(sinal_original, sinal_ruidoso, retorno = "sigma") 
-		print(f"sigma em visu_shrink: {sigma}") 
 		limiar = sigma * sqrt(2 * np.log(sinal_original.size)) 
 		return limiar
 
@@ -284,28 +312,28 @@ def hard_thresholding(coeficientes, limiar):
 def main():
 	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
 	mostra_sinal(sinal, tempos, "r")
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 10)
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 20)
 	mostra_sinal(ruidoso, tempos, "r")
 
 	snr_db = snr(sinal, ruidoso)
-	print(snr_db)
+	print(f"snr original = {snr_db}")
 
 	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 4)
 	mostra_WT(transformado, dt)
 
-	snr_db = estima_snr_wavelet(transformado, sinal)
-	print(snr_db)
+	snr_db = estima_snr_wavelet(transformado, sinal, 700)
+	print(f"snr por wavelet = {snr_db}")
 
-	limiar = visu_shrink(ruidoso, sinal) 
-	print(limiar) 
+	limiar = visu_shrink(ruidoso, sinal)
+	print(f"limiar calculado por VisuShrink = {limiar}") 
 	transf_n_linear = hard_thresholding(transformado, limiar) 
-	mostra_WT(transf_n_linear, dt, "i") 
+	mostra_WT(transf_n_linear, dt, "m") 
 
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2") 
 	mostra_sinal(reconstroi, tempos, "r")
 
 	db = snr(sinal, reconstroi)
-	print(db)
+	print(f"snr dps de filtrar = {db}")
 
 	return 0
 
