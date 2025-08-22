@@ -243,7 +243,6 @@ def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, 
 		
 	if mode == "snr":
 		sigma = sigma_rayleigh(snr_db = param, sinal = sinal)
-		print(f"sigma dentro de adiciona_ruido = {sigma}")
 	else:
 		sigma = param
 
@@ -285,13 +284,11 @@ def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
 		return converte_snr(snr_lin)
 	elif retorno == "sigma":
 		sigma = sigma_gauss(ruido_gauss.real)
-		print(f"sigma em snr: {sigma}")
 		return sigma
 	return snr_lin
 
 def estima_snr_wavelet(sinal_ruidoso_coeficientes, original, ponto):
 	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1][ponto::])) / (1.17741)
-	print(f"sigma em estima_snr_wavelet: {sigma}")
 	snr_lin = potencia_media(original) / (2 * sigma ** 2)
 	snr_db = converte_snr(snr_lin)
 	return snr_db

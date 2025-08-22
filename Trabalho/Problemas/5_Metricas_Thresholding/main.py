@@ -212,27 +212,35 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 				pass
 			else:
 				print("Você escolheu filtrar o sinal transformado.")
-				print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
+				escolha2 = input("\nVocê deseja usar o filtro original (O), hard thresholding (H) ou soft thresholding (S)?").upper()
 
-				tamanho = len(sinal)
+				if escolha2 == "O":
+					print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
 
-				print(f"Seu sinal original possui {tamanho} pontos.\n")
+					tamanho = len(sinal)
 
-				if level == 1:
-					entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
-				else:
-					entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
+					print(f"Seu sinal original possui {tamanho} pontos.\n")
 
-				nivel = int(input(entrada))
+					if level == 1:
+						entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
+					else:
+						entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
 
-				if nivel != 0:
-					nivel = nivel * (-1)
+					nivel = int(input(entrada))
 
-				indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
-				
-				coeficientes[nivel][indice::] = 0
+					if nivel != 0:
+						nivel = nivel * (-1)
 
-				print("\nSeu sinal foi filtrado.")
+					indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
+					
+					coeficientes[nivel][indice::] = 0
+
+					print("\nSeu sinal foi filtrado.")
+
+				elif escolha2 == "H":
+					original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
+					limiar = ul.visu_shrink(sinal, original)
+					coeficientes = ul.hard_thresholding(coeficientes, limiar)
 
 		elif escolha == "I":
 			print("Você escolheu salvar a IDTWT em um arquivo.")
@@ -477,7 +485,7 @@ def menu_muda_sinal(sinal, tempos, dt):
 		print("\tL: Lista todos os sinais acessíveis ao programa.\tA: Soma um sinal ao sinal com foco atual.")
 		print("\tS: Salva o sinal atual em um arquivo.\t\t\tN: Cria um novo sinal unidimensional.")
 		print("\tD: Deleta um sinal salvo.\t\t\t\tF: Muda o foco para outro sinal.")
-		print("\tR: Adiciona ruído gaussiano a um sinal.")
+		print("\tR: Adiciona ruído gaussiano a um sinal.\t\t\tC: Calcula a SNR entre um sinal ruidoso e o original.")
 		print("\tM: Mostra este menu novamente.\t\t\t\tX: Sair deste menu.")
 		print("Foco: ", nome_sinal)
 		if not salvou:
@@ -603,14 +611,13 @@ def menu_muda_sinal(sinal, tempos, dt):
 			print("\n\tP(x) = 1/(sigma * sqrt(2 * pi)) * exp(-((x - mu)^2)/(2 * sigma^2))")
 			print("\nOnde mu indica a média, e sigma o desvio padrão.")
 
-			mu = float(input("\nEntre com o valor de mu: "))
-			sigma = float(input("Entre com o valor de sigma: "))
+			snr_db = float(input("Entre com o valor da SNR desejada em dB: "))
 			nome_salva = input("Entre com um nome para dar ao sinal ruidoso: ")
 
 			if isImage:
-				sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma, True, f"Imagens/{nome_salva}.pgm")
+				sinal_ruidoso = ul.adiciona_ruido(sinal, mode = "snr", param = snr_db, isImage = True, outputpath = f"Imagens/{nome_salva}.pgm")
 			else:
-				sinal_ruidoso = ul.adiciona_ruido_gauss(sinal, mu, sigma)
+				sinal_ruidoso = ul.adiciona_ruido(sinal, mode = "snr", param = snr_db)
 				ul.salva_sinal(sinal_ruidoso, tempos, nome_salva)
 			
 			print("\nSinal ruidoso criado.")
@@ -619,7 +626,7 @@ def menu_muda_sinal(sinal, tempos, dt):
 			print("Você escolheu calcular o SNR do sinal.")
 			original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
 			degradado, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal degradado: "))
-			snr = ul.snr(original, degradado, retorno = "linear")
+			snr = ul.snr(original, degradado)
 			print(f"Esse sinal possui SNR de {snr}")
 
 		elif escolha == "M":
