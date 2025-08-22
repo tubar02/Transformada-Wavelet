@@ -344,6 +344,7 @@ def main():
 	snr_db = snr(sinal, ruidoso, isImage = True)
 	print(f"snr original = {snr_db}")
 
+<<<<<<< HEAD
 	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 2, True)
 	mostra_WT(transformado, isImage = True, level = 1)
 
@@ -352,6 +353,24 @@ def main():
 	mostra_WT(transf_n_linear, isImage = True, level = 1) 
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2", True)
 	mostra_sinal(reconstroi, isImage = True)
+=======
+	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 150)
+	mostra_WT(transformado, dt)
+
+	snr_db = estima_snr_wavelet(transformado, sinal)
+	print(snr_db)
+
+	limiar = visu_shrink(ruidoso, sinal) 
+	print(limiar) 
+	transf_n_linear = hard_thresholding(transformado, limiar) 
+	mostra_WT(transf_n_linear, dt, "m") 
+
+	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2") 
+	mostra_sinal(reconstroi, tempos, "r")
+
+	db = snr(sinal, reconstroi)
+	print(db)
+>>>>>>> 9a364e5 (Adiciona gráficos que mostram o hard thresholding em um sinal 1D.)
 
 	db = snr(sinal, reconstroi, isImage = True)
 	print(f"snr dps de filtrar = {db}")
