@@ -312,7 +312,7 @@ def visu_shrink(coeficiente, sigma):
 	limiar = sigma * sqrt(2 * np.log(coeficiente.size)) 
 	return limiar
 
-def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None): 
+def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None, familia = "db2"): 
 	if not isImage:
 		novos_coefs = [coeficientes[0]]
 		for lista in coeficientes[1::]: 
@@ -330,7 +330,7 @@ def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None):
 				novos_detalhes.append(detalhe)
 			novos_coefs.append(novos_detalhes)
 		novos_coefs = tuple(novos_coefs)
-		imagem_reconstruida = pywt.waverec2(novos_coefs, "db2")
+		imagem_reconstruida = pywt.waverec2(novos_coefs, familia)
 		imagem = mil.pgm_from_matrix(outputpath, imagem_reconstruida)
 		novos_coefs = aplica_DTWT_em_sinal(imagem, coeficientes.wavelet, coeficientes.level, True)
 	return novos_coefs
@@ -338,39 +338,20 @@ def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None):
 def main():
 	sinal, _, _ = le_arquivo_sinal("Imagens//MRI.pgm", True)
 	mostra_sinal(sinal, isImage = True)
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 5, isImage = True, outputpath = "Imagens//gourds_gauss.pgm")
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 30, isImage = True, outputpath = "Imagens//gourds_gauss.pgm")
 	mostra_sinal(ruidoso, isImage = True)
 
 	snr_db = snr(sinal, ruidoso, isImage = True)
 	print(f"snr original = {snr_db}")
 
-<<<<<<< HEAD
-	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 2, True)
+	transformado = aplica_DTWT_em_sinal(ruidoso, "coif2", 2, True)
 	mostra_WT(transformado, isImage = True, level = 1)
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma", isImage = True)
-	transf_n_linear = hard_thresholding(transformado, sigma, True, "Imagens//MRI_hard_visu.pgm") 
+	transf_n_linear = hard_thresholding(transformado, sigma, True, "Imagens//MRI_hard_visu.pgm", "coif2") 
 	mostra_WT(transf_n_linear, isImage = True, level = 1) 
-	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2", True)
+	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "coif2", True)
 	mostra_sinal(reconstroi, isImage = True)
-=======
-	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 150)
-	mostra_WT(transformado, dt)
-
-	snr_db = estima_snr_wavelet(transformado, sinal)
-	print(snr_db)
-
-	limiar = visu_shrink(ruidoso, sinal) 
-	print(limiar) 
-	transf_n_linear = hard_thresholding(transformado, limiar) 
-	mostra_WT(transf_n_linear, dt, "m") 
-
-	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2") 
-	mostra_sinal(reconstroi, tempos, "r")
-
-	db = snr(sinal, reconstroi)
-	print(db)
->>>>>>> 9a364e5 (Adiciona gráficos que mostram o hard thresholding em um sinal 1D.)
 
 	db = snr(sinal, reconstroi, isImage = True)
 	print(f"snr dps de filtrar = {db}")

@@ -585,10 +585,7 @@ def menu_muda_sinal(sinal, tempos, dt):
 
 			if caminho.exists() and salvou:
 				nome_sinal = nome_foca
-				if isImage:
-					sinal = ul.le_arquivo_sinal(caminho, True)
-				else:
-					sinal, tempos, dt = ul.le_arquivo_sinal(caminho)
+				sinal, tempos, dt = ul.le_arquivo_sinal(caminho, isImage)
 				print("\nO foco foi alterado.")
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
