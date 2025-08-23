@@ -5,11 +5,15 @@ Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma 
 ---
 ## 📦 Organização do Repositório
 ```text
-📁 Documentos Institucionais/             # Relatórios e documentos formais da IC
-│   ├── 📁 Materiais Produzidos/           # Relatórios e apresentações produzidos
-│   └── 📁 Relatórios/                     # Relatórios detalhados (parte prática e teórica)
+📁 .github/                               # Arquivos de metadados do repositório
+│   ├── 📄 LICENSE                        # Licença do projeto (MIT)
+│   └── 📄 README.md                      # Descrição auxiliar (visível no GitHub em alguns contextos)
 │
-📁 Material/                               # Referências teóricas e artigos utilizados
+📁 Documentos Institucionais/             # Relatórios e documentos formais da IC
+│   ├── 📁 Materiais Produzidos/          # Relatórios e apresentações produzidos
+│   └── 📁 Relatórios/                    # Relatórios detalhados (parte prática e teórica)
+│
+📁 Material/                              # Referências teóricas e artigos utilizados
 │   ├── 📁 Aplicações Biomédicas/
 │   ├── 📁 Imagens por Ressonância Magnética Funcional (fMRI)/
 │   ├── 📁 Instrumentação e Aquisição de Dados/
@@ -17,21 +21,23 @@ Este projeto reúne códigos, estudos e materiais produzidos no contexto de uma 
 │   ├── 📁 Técnicas de Thresholding e Remoção de Ruído/
 │   └── 📁 Wavelets Complexas e Multidimensionais/
 │
-📁 Trabalho/                               # Implementações práticas e códigos
-│   ├── 📁 Problemas/                      # Evolução do projeto principal
-│   │   ├── 📁 1_Simulacao_Sinal_FT/       # Fourier e simulação de S(t)
-│   │   ├── 📁 2_Sinais_Multiplas_Fontes/  # Sinais com múltiplas fontes
-│   │   ├── 📁 3_Sinais_Imagens_Ruido/     # Inclusão de imagens e ruído gaussiano
-│   │   └── 📁 4_Implementacao_Wavelet/    # Wavelet 1D e 2D
+📁 Trabalho/                              # Implementações práticas e códigos
+│   ├── 📁 Problemas/                     # Evolução do projeto principal
+│   │   ├── 📁 1_Simulacao_Sinal_FT/      # Fourier e simulação de S(t)
+│   │   ├── 📁 2_Sinais_Multiplas_Fontes/ # Sinais com múltiplas fontes
+│   │   ├── 📁 3_Sinais_Imagens_Ruido/    # Inclusão de imagens e ruído gaussiano
+│   │   ├── 📁 4_Implementacao_Wavelet/   # Wavelet 1D e 2D
+│   │   └── 📁 5_Metricas_Thresholding/   # Métricas e técnicas de thresholding
 │   │
-│   └── 📁 Processamento_de_Imagens/       # Conteúdo da disciplina de Processamento de Imagens
-│       ├── 📁 Biblioteca_my_image_lib/    # Versões de desenvolvimento da biblioteca
-│       ├── 📁 Utilitarios/                 # Scripts úteis para a IC
-│       └── 📁 Historico_Disciplina/        # Trabalhos e materiais originais da disciplina
+│   └── 📁 Processamento_de_Imagens/      # Conteúdo da disciplina de Processamento de Imagens
+│       ├── 📁 Biblioteca_my_image_lib/   # Versões de desenvolvimento da biblioteca
+│       ├── 📁 codigos_auxiliares/        # Scripts úteis para a IC
+│       └── 📁 Historico_Disciplina/      # Trabalhos e materiais originais da disciplina
 │
-📄 requirements.txt                        # Dependências do projeto
-📄 README.md                               # Documentação principal
-🗝️ LICENSE								    # Licença
+📄 requirements.txt                       # Dependências do projeto
+📄 README.md                              # Documentação principal
+📄 CITATION.cff                           # Informações de citação
+📄 .gitignore                             # Arquivos ignorados pelo Git
 ```
 
 ## ⚙️ Requisitos
