@@ -624,9 +624,9 @@ def menu_muda_sinal(sinal, tempos, dt):
 
 		elif escolha == "C":
 			print("Você escolheu calcular o SNR do sinal.")
-			original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
-			degradado, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal degradado: "))
-			snr = ul.snr(original, degradado)
+			original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "), isImage)
+			degradado, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal degradado: "), isImage)
+			snr = ul.snr(original, degradado, isImage = isImage)
 			print(f"Esse sinal possui SNR de {snr}")
 
 		elif escolha == "M":

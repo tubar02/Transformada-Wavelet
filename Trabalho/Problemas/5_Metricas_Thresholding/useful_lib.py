@@ -16,7 +16,7 @@ with open("first_parameters.txt", "r") as valores_iniciais: #recebe os primeiros
 def le_arquivo_sinal(caminho_arq, isImage = False):
 	if isImage:
 		sinal = mil.Image(f"{caminho_arq}")
-		return sinal
+		return sinal, None, None
 
 	else:
 		with open(f"{caminho_arq}", "r") as arquivo_sinal:
@@ -197,13 +197,15 @@ def aplica_IDTWT_em_sinal(coeficientes, familia = None, isImage = False):
 		sinal_rec = pywt.waverec(coeficientes, wavelet=familia)
 		return sinal_rec
 
-def potencia_media(sinal):
+def potencia_media(sinal, isImage = False):
 	"""
     Potência média do sinal (1D ou 2D, real ou complexo).
     Usa |x|^2 para sinais complexos, como em RM.
     """
-
-	potencia = np.abs(sinal) ** 2
+	if not isImage:
+		potencia = np.abs(sinal) ** 2
+	else:
+		potencia = np.abs(np.asarray(sinal.pixel())) ** 2
 	return potencia.mean()
 
 def converte_snr(snr, saida = "db"):
@@ -214,16 +216,19 @@ def converte_snr(snr, saida = "db"):
 		snr_lin = 10 ** (snr / 10)
 		return snr_lin
 
-def sigma_gauss(componente_ruido_gauss = None, sinal = None, snr_db = None):
+def sigma_gauss(componente_ruido_gauss = None, sinal = None, snr_db = None, isImage = False):
 	if snr_db != None:
-		sigma = sqrt(potencia_media(sinal) / converte_snr(snr_db, "lin"))
+		sigma = sqrt(potencia_media(sinal, isImage) / converte_snr(snr_db, "lin"))
 	else:
 		sigma = sqrt(potencia_media(componente_ruido_gauss))
 	return sigma
 
-def sigma_rayleigh(mod_ruido_gauss_complex = None, sinal = None, snr_db = None):
+def sigma_rayleigh(mod_ruido_gauss_complex = None, sinal = None, snr_db = None, isImage = False):
 	if snr_db != None:
-		sigma = sqrt(potencia_media(sinal) / (2 *converte_snr(snr_db, "lin")))
+		if not isImage:
+			sigma = sqrt(potencia_media(sinal, isImage) / (2 *converte_snr(snr_db, "lin")))
+		else:
+			sigma = sigma_gauss(mod_ruido_gauss_complex, sinal, snr_db, isImage)
 	else:
 		sigma = sqrt(potencia_media(mod_ruido_gauss_complex) / 2)
 	return sigma
@@ -242,7 +247,7 @@ def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, 
 	"""
 		
 	if mode == "snr":
-		sigma = sigma_rayleigh(snr_db = param, sinal = sinal)
+		sigma = sigma_rayleigh(snr_db = param, sinal = sinal, isImage = isImage)
 	else:
 		sigma = param
 
@@ -262,7 +267,7 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		ruido2 = np.random.normal(mu, sigma, len(sinal)) * 1j
 		return sinal + ruido1 + ruido2
 
-def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
+def snr(original, degradado = None, ruido = None, retorno = "db", isImage = False):
 	"""
 	SNR entre um original e um degradado (ou original e ruído).
 	- original: np.ndarray 1D/2D (real ou complexo)
@@ -270,14 +275,24 @@ def snr(original, degradado=None, ruido=None, retorno="db", eps=1e-12):
 	- ruido: opcional; se dado, ignora 'degradado'
 	- retorno: "db" (default), "linear" ou "sigma"
 	"""
-	if ruido is None:
-		assert degradado is not None, "Passe 'degradado' ou 'ruido'."
-		ruido_gauss = degradado - original
-	else:
-		ruido_gauss = ruido
+	if not isImage:
+		if ruido is None:
+			assert degradado is not None, "Passe 'degradado' ou 'ruido'."
+			ruido_gauss = degradado - original
+		else:
+			ruido_gauss = ruido
 
-	p_sig = potencia_media(original)
-	p_rui = potencia_media(ruido_gauss) + eps  # evita div/0
+		p_sig = potencia_media(original)
+		p_rui = potencia_media(ruido_gauss)
+	else:
+		if ruido is None:
+			assert degradado is not None, "Passe 'degradado' ou 'ruido'."
+			ruido_gauss = np.asarray(degradado.pixel()) - np.asarray(original.pixel())
+		else:
+			ruido_gauss = ruido
+
+		p_sig = potencia_media(original, isImage)
+		p_rui = potencia_media(ruido_gauss)
 
 	snr_lin = p_sig / p_rui
 	if retorno == "db":
@@ -293,45 +308,57 @@ def estima_snr_wavelet(sinal_ruidoso_coeficientes, original, ponto):
 	snr_db = converte_snr(snr_lin)
 	return snr_db
 
-def visu_shrink(sinal_ruidoso, sinal_original = None): 
-	if sinal_original is not None: 
-		sigma = snr(sinal_original, sinal_ruidoso, retorno = "sigma") 
-		limiar = sigma * sqrt(2 * np.log(sinal_original.size)) 
-		return limiar
+def visu_shrink(coeficiente, sigma): 
+	limiar = sigma * sqrt(2 * np.log(coeficiente.size)) 
+	return limiar
 
-def hard_thresholding(coeficientes, limiar): 
-	novos_coefs = [coeficientes[0]]
-	for lista in coeficientes[1::]: 
-		lista = np.asarray([i if np.abs(i) >= limiar else 0 for i in lista ]) 
-		novos_coefs.append(lista) 
+def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None): 
+	if not isImage:
+		novos_coefs = [coeficientes[0]]
+		for lista in coeficientes[1::]: 
+			limiar = visu_shrink(lista, sigma)
+			lista = np.asarray([i if np.abs(i) >= limiar else 0 for i in lista]) 
+			novos_coefs.append(lista) 
+	else:
+		coeficientes_wt = coeficientes.coef
+		novos_coefs = [coeficientes_wt[0]]
+		for detalhes in coeficientes_wt[1::]:
+			novos_detalhes = []
+			for detalhe in detalhes:
+				limiar = visu_shrink(detalhe, sigma)
+				detalhe = np.asarray([[i if np.abs(i) >= limiar else 0 for i in linha] for linha in detalhe])
+				novos_detalhes.append(detalhe)
+			novos_coefs.append(novos_detalhes)
+		novos_coefs = tuple(novos_coefs)
+		imagem_reconstruida = pywt.waverec2(novos_coefs, "db2")
+		imagem = mil.pgm_from_matrix(outputpath, imagem_reconstruida)
+		novos_coefs = aplica_DTWT_em_sinal(imagem, coeficientes.wavelet, coeficientes.level, True)
 	return novos_coefs
 
 def main():
-	sinal, tempos, dt = le_arquivo_sinal("Sinais//SMNR.txt")
-	mostra_sinal(sinal, tempos, "r")
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 20)
-	mostra_sinal(ruidoso, tempos, "r")
+	sinal, _, _ = le_arquivo_sinal("Imagens//MRI.pgm", True)
+	mostra_sinal(sinal, isImage = True)
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 5, isImage = True, outputpath = "Imagens//gourds_gauss.pgm")
+	mostra_sinal(ruidoso, isImage = True)
 
-	snr_db = snr(sinal, ruidoso)
+	snr_db = snr(sinal, ruidoso, isImage = True)
 	print(f"snr original = {snr_db}")
 
-	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 4)
-	mostra_WT(transformado, dt)
+	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 2, True)
+	mostra_WT(transformado, isImage = True, level = 1)
 
+	sigma = snr(sinal, ruidoso, retorno = "sigma", isImage = True)
+	transf_n_linear = hard_thresholding(transformado, sigma, True, "Imagens//MRI_hard_visu.pgm") 
+	mostra_WT(transf_n_linear, isImage = True, level = 1) 
+	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2", True)
+	mostra_sinal(reconstroi, isImage = True)
+
+	db = snr(sinal, reconstroi, isImage = True)
+	print(f"snr dps de filtrar = {db}")
+	'''
 	snr_db = estima_snr_wavelet(transformado, sinal, 700)
 	print(f"snr por wavelet = {snr_db}")
-
-	limiar = visu_shrink(ruidoso, sinal)
-	print(f"limiar calculado por VisuShrink = {limiar}") 
-	transf_n_linear = hard_thresholding(transformado, limiar) 
-	mostra_WT(transf_n_linear, dt, "m") 
-
-	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2") 
-	mostra_sinal(reconstroi, tempos, "r")
-
-	db = snr(sinal, reconstroi)
-	print(f"snr dps de filtrar = {db}")
-
+	'''
 	return 0
 
 if __name__ == "__main__":

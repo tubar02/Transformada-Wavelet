@@ -649,6 +649,8 @@ class Ruido(): #classe para acrescentar ruído em imagens digitais
 
 #funções úteis
 def pgm_from_matrix(outputpath, matrix):
+	matrix = [[int(round(i)) for i in linha] for linha in matrix]
+
 	with open(outputpath, "w") as arquivo:
 			arquivo.write("P2" + "\n") #escreve o número mágico
 			arquivo.write(str(len(matrix[0])) + " " + str(len(matrix)) + "\n") #escreve as dimensões
