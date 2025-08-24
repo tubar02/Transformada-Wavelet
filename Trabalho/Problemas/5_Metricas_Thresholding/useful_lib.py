@@ -274,8 +274,7 @@ def _align_same_shape(Sinal_A, Sinal_B, isImage):
 		if not isImage:
 			Sinal_A, Sinal_B = np.asarray(Sinal_A), np.asarray(Sinal_B)
 			h = min(Sinal_A.shape[0], Sinal_B.shape[0])
-			w = min(Sinal_A.shape[1], Sinal_B.shape[1])
-			return Sinal_A[:h, :w], Sinal_B[:h, :w]
+			return Sinal_A[:h], Sinal_B[:h]
 		else:
 			matriz_a, matriz_b = np.asarray(Sinal_A.pixel()), np.asarray(Sinal_B.pixel())
 			h = min(matriz_a.shape[0], matriz_b.shape[0])
@@ -322,13 +321,13 @@ def snr(original, degradado = None, ruido = None, retorno = "db", isImage = Fals
 		sigma = sigma_gauss(ruido_gauss.real)
 		return sigma
 	return snr_lin
-
+'''
 def estima_snr_wavelet(sinal_ruidoso_coeficientes, original, ponto):
 	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1][ponto::])) / (1.17741)
 	snr_lin = potencia_media(original) / (2 * sigma ** 2)
 	snr_db = converte_snr(snr_lin)
 	return snr_db
-
+'''
 def visu_shrink(coeficiente, sigma): 
 	limiar = sigma * sqrt(2 * np.log(coeficiente.size)) 
 	return limiar
@@ -357,6 +356,8 @@ def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None):
 	return novos_coefs
 
 def main():
+	print("\nSinais 2D:\n")
+
 	sinal, _, _ = le_arquivo_sinal("Imagens//MRI.pgm", True)
 	mostra_sinal(sinal, isImage = True)
 	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 15, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
@@ -375,6 +376,28 @@ def main():
 	mostra_sinal(reconstroi, isImage = True)
 
 	db = snr(sinal, reconstroi, isImage = True)
+	print(f"snr dps de filtrar = {db} dB")
+
+	print("\nSinais 1D:\n")
+
+	sinal, tempos, dt = le_arquivo_sinal("Sinais//Partes1234.txt")
+	mostra_sinal(sinal, tempos, "r")
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 12)
+	mostra_sinal(ruidoso, tempos, "r")
+
+	snr_db = snr(sinal, ruidoso)
+	print(f"snr original = {snr_db} dB")
+
+	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 3)
+	mostra_WT(transformado, dt)
+
+	sigma = snr(sinal, ruidoso, retorno = "sigma")
+	transf_n_linear = hard_thresholding(transformado, sigma, ) 
+	mostra_WT(transf_n_linear, dt) 
+	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2")
+	mostra_sinal(reconstroi, tempos, "r")
+
+	db = snr(sinal, reconstroi)
 	print(f"snr dps de filtrar = {db} dB")
 	'''
 	snr_db = estima_snr_wavelet(transformado, sinal, 700)

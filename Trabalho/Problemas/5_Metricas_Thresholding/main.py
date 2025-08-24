@@ -239,8 +239,12 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 
 				elif escolha2 == "H":
 					original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
-					limiar = ul.visu_shrink(sinal, original)
-					coeficientes = ul.hard_thresholding(coeficientes, limiar)
+					sigma = ul.snr(original, sinal, retorno = "sigma")
+					coeficientes = ul.hard_thresholding(coeficientes, sigma)
+					print("\nO sinal foi filtrado.")
+
+				elif escolha2 == "F":
+					pass
 
 		elif escolha == "I":
 			print("Você escolheu salvar a IDTWT em um arquivo.")
@@ -625,8 +629,7 @@ def menu_muda_sinal(sinal, tempos, dt):
 		elif escolha == "C":
 			print("Você escolheu calcular o SNR do sinal.")
 			original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "), isImage)
-			degradado, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal degradado: "), isImage)
-			snr = ul.snr(original, degradado, isImage = isImage)
+			snr = ul.snr(original, sinal, isImage = isImage)
 			print(f"Esse sinal possui SNR de {snr}")
 
 		elif escolha == "M":
