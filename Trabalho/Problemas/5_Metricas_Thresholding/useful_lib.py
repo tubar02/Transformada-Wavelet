@@ -227,8 +227,6 @@ def sigma_rayleigh(mod_ruido_gauss_complex = None, sinal = None, snr_db = None, 
 	if snr_db != None:
 		if not isImage:
 			sigma = sqrt(potencia_media(sinal, isImage) / (2 *converte_snr(snr_db, "lin")))
-		else:
-			sigma = sigma_gauss(mod_ruido_gauss_complex, sinal, snr_db, isImage)
 	else:
 		sigma = sqrt(potencia_media(mod_ruido_gauss_complex) / 2)
 	return sigma
@@ -247,7 +245,12 @@ def adiciona_ruido(sinal, noise_type = "gaussian", mode = "sigma", param = 0.1, 
 	"""
 		
 	if mode == "snr":
-		sigma = sigma_rayleigh(snr_db = param, sinal = sinal, isImage = isImage)
+		if isImage:
+			# imagem em intensidades -> fórmula sem fator 2
+			sigma = sigma_gauss(sinal=sinal, snr_db=param, isImage=True)
+		else:
+			# 1D/2D complexos -> com fator 2
+			sigma = sigma_rayleigh(sinal=sinal, snr_db=param, isImage=False)
 	else:
 		sigma = param
 
@@ -267,6 +270,20 @@ def adiciona_ruido_gauss(_sinal, mu, sigma, isImage = False, outputpath = None):
 		ruido2 = np.random.normal(mu, sigma, len(sinal)) * 1j
 		return sinal + ruido1 + ruido2
 
+def _align_same_shape(Sinal_A, Sinal_B, isImage):
+		if not isImage:
+			Sinal_A, Sinal_B = np.asarray(Sinal_A), np.asarray(Sinal_B)
+			h = min(Sinal_A.shape[0], Sinal_B.shape[0])
+			w = min(Sinal_A.shape[1], Sinal_B.shape[1])
+			return Sinal_A[:h, :w], Sinal_B[:h, :w]
+		else:
+			matriz_a, matriz_b = np.asarray(Sinal_A.pixel()), np.asarray(Sinal_B.pixel())
+			h = min(matriz_a.shape[0], matriz_b.shape[0])
+			w = min(matriz_a.shape[1], matriz_b.shape[1])
+			matriz_a, matriz_b = matriz_a[:h, :w], matriz_b[:h, :w]
+			Sinal_A.pixels, Sinal_B.pixels = matriz_a, matriz_b
+			return Sinal_A, Sinal_B
+
 def snr(original, degradado = None, ruido = None, retorno = "db", isImage = False):
 	"""
 	SNR entre um original e um degradado (ou original e ruído).
@@ -275,6 +292,10 @@ def snr(original, degradado = None, ruido = None, retorno = "db", isImage = Fals
 	- ruido: opcional; se dado, ignora 'degradado'
 	- retorno: "db" (default), "linear" ou "sigma"
 	"""
+
+	original, degradado = deepcopy(original), deepcopy(degradado)
+	_align_same_shape(original, degradado, isImage)
+
 	if not isImage:
 		if ruido is None:
 			assert degradado is not None, "Passe 'degradado' ou 'ruido'."
@@ -338,23 +359,23 @@ def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None):
 def main():
 	sinal, _, _ = le_arquivo_sinal("Imagens//MRI.pgm", True)
 	mostra_sinal(sinal, isImage = True)
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 5, isImage = True, outputpath = "Imagens//gourds_gauss.pgm")
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 15, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
 	mostra_sinal(ruidoso, isImage = True)
 
 	snr_db = snr(sinal, ruidoso, isImage = True)
-	print(f"snr original = {snr_db}")
+	print(f"snr original = {snr_db} dB")
 
 	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 2, True)
-	mostra_WT(transformado, isImage = True, level = 1)
+	mostra_WT(transformado, isImage = True, level = 2)
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma", isImage = True)
 	transf_n_linear = hard_thresholding(transformado, sigma, True, "Imagens//MRI_hard_visu.pgm") 
-	mostra_WT(transf_n_linear, isImage = True, level = 1) 
+	mostra_WT(transf_n_linear, isImage = True, level = 2) 
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2", True)
 	mostra_sinal(reconstroi, isImage = True)
 
 	db = snr(sinal, reconstroi, isImage = True)
-	print(f"snr dps de filtrar = {db}")
+	print(f"snr dps de filtrar = {db} dB")
 	'''
 	snr_db = estima_snr_wavelet(transformado, sinal, 700)
 	print(f"snr por wavelet = {snr_db}")

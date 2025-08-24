@@ -630,7 +630,7 @@ class Ruido(): #classe para acrescentar ruído em imagens digitais
 		self.pixels = self.dimensions[0] * self.dimensions[1] #pixels no total
 	
 	def gauss(self, mu, sigma):
-		ruido = np.random.normal(mu, sigma, (self.dimensions[1], self.dimensions[0])).astype(int)
+		ruido = np.random.normal(mu, sigma, (self.dimensions[1], self.dimensions[0]))
 		for i in range(len(ruido)):
 			for j in range(len(ruido[0])):
 				self.ruido[i][j] = ruido[i][j]
