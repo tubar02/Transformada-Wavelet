@@ -208,43 +208,45 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 				ul.mostra_WT(coeficientes, dt, escolha, isImage)
 
 		elif escolha == "P":
-			if isImage:
+			print("Você escolheu filtrar o sinal transformado.")
+			escolha2 = input("\nVocê deseja usar o filtro original (O) (1D), hard thresholding (H) ou soft thresholding (S)?").upper()
+
+			if escolha2 == "O":
+				if isImage:
+					print("Filtro não disponível para sinais 2D.")
+					continue
+
+				print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
+
+				tamanho = len(sinal)
+
+				print(f"Seu sinal original possui {tamanho} pontos.\n")
+
+				if level == 1:
+					entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
+				else:
+					entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
+
+				nivel = int(input(entrada))
+
+				if nivel != 0:
+					nivel = nivel * (-1)
+
+				indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
+				
+				coeficientes[nivel][indice::] = 0
+
+				print("\nSeu sinal foi filtrado.")
+
+			elif escolha2 == "H":
+				original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
+				sigma = ul.snr(original, sinal, retorno = "sigma", isImage = isImage)
+				sinal_filtrado = ul.hard_thresholding(coeficientes, sigma, isImage)
+				coeficientes = ul.aplica_DTWT_em_sinal(sinal_filtrado, familia, level, isImage)
+				print("\nO sinal foi filtrado.")
+
+			elif escolha2 == "F":
 				pass
-			else:
-				print("Você escolheu filtrar o sinal transformado.")
-				escolha2 = input("\nVocê deseja usar o filtro original (O), hard thresholding (H) ou soft thresholding (S)?").upper()
-
-				if escolha2 == "O":
-					print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
-
-					tamanho = len(sinal)
-
-					print(f"Seu sinal original possui {tamanho} pontos.\n")
-
-					if level == 1:
-						entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
-					else:
-						entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
-
-					nivel = int(input(entrada))
-
-					if nivel != 0:
-						nivel = nivel * (-1)
-
-					indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
-					
-					coeficientes[nivel][indice::] = 0
-
-					print("\nSeu sinal foi filtrado.")
-
-				elif escolha2 == "H":
-					original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
-					sigma = ul.snr(original, sinal, retorno = "sigma")
-					coeficientes = ul.hard_thresholding(coeficientes, sigma)
-					print("\nO sinal foi filtrado.")
-
-				elif escolha2 == "F":
-					pass
 
 		elif escolha == "I":
 			print("Você escolheu salvar a IDTWT em um arquivo.")

@@ -588,10 +588,13 @@ class Wavelet_Image(Image):
 	def coeficientes(self):
 		return self.coef  # retorna (LL, (LH, HL, HH))
 
+	def muda_arquivo_saida(self, outputpath):
+		self._local = outputpath
+	
 	def reconstruir(self):
 		matriz_rec = pywt.waverec2(self.coef, self.wavelet)
 		matriz_rec = np.clip(matriz_rec, 0, 255).round().astype(int).tolist()
-		return pgm_from_matrix(self._local[:-4] + "_reconstruida.pgm", matriz_rec)
+		return pgm_from_matrix(self._local, matriz_rec)
 
 	def representar_nivel(self, nivel):
 		"""

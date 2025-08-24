@@ -188,8 +188,9 @@ def mostra_WT(coeficientes, dt = None, componente = "m", isImage = False, level 
 		plt.tight_layout()
 		plt.show()
 
-def aplica_IDTWT_em_sinal(coeficientes, familia = None, isImage = False):
+def aplica_IDTWT_em_sinal(coeficientes, familia = None, isImage = False, outputpath = None):
 	if isImage:
+		coeficientes.muda_arquivo_saida(outputpath)
 		imagem_rec = coeficientes.reconstruir()
 		return imagem_rec
 
@@ -226,7 +227,7 @@ def sigma_gauss(componente_ruido_gauss = None, sinal = None, snr_db = None, isIm
 def sigma_rayleigh(mod_ruido_gauss_complex = None, sinal = None, snr_db = None, isImage = False):
 	if snr_db != None:
 		if not isImage:
-			sigma = sqrt(potencia_media(sinal, isImage) / (2 *converte_snr(snr_db, "lin")))
+			sigma = sqrt(potencia_media(sinal, isImage) / (2 * converte_snr(snr_db, "lin")))
 	else:
 		sigma = sqrt(potencia_media(mod_ruido_gauss_complex) / 2)
 	return sigma
@@ -332,13 +333,14 @@ def visu_shrink(coeficiente, sigma):
 	limiar = sigma * sqrt(2 * np.log(coeficiente.size)) 
 	return limiar
 
-def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None): 
+def hard_thresholding(coeficientes, sigma, familia = None, isImage = False): 
 	if not isImage:
 		novos_coefs = [coeficientes[0]]
 		for lista in coeficientes[1::]: 
 			limiar = visu_shrink(lista, sigma)
 			lista = np.asarray([i if np.abs(i) >= limiar else 0 for i in lista]) 
 			novos_coefs.append(lista) 
+		return novos_coefs
 	else:
 		coeficientes_wt = coeficientes.coef
 		novos_coefs = [coeficientes_wt[0]]
@@ -350,10 +352,8 @@ def hard_thresholding(coeficientes, sigma, isImage = False, outputpath = None):
 				novos_detalhes.append(detalhe)
 			novos_coefs.append(novos_detalhes)
 		novos_coefs = tuple(novos_coefs)
-		imagem_reconstruida = pywt.waverec2(novos_coefs, "db2")
-		imagem = mil.pgm_from_matrix(outputpath, imagem_reconstruida)
-		novos_coefs = aplica_DTWT_em_sinal(imagem, coeficientes.wavelet, coeficientes.level, True)
-	return novos_coefs
+		coeficientes.coef = novos_coefs
+		return coeficientes
 
 def main():
 	print("\nSinais 2D:\n")
@@ -370,12 +370,12 @@ def main():
 	mostra_WT(transformado, isImage = True, level = 2)
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma", isImage = True)
-	transf_n_linear = hard_thresholding(transformado, sigma, True, "Imagens//MRI_hard_visu.pgm") 
+	transf_n_linear = hard_thresholding(transformado, sigma, isImage = True)
 	mostra_WT(transf_n_linear, isImage = True, level = 2) 
-	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2", True)
+	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, isImage = True, outputpath = "Imagens//MRI_hard_visu.pgm")
 	mostra_sinal(reconstroi, isImage = True)
 
-	db = snr(sinal, reconstroi, isImage = True)
+	db = snr(sinal, transf_n_linear, isImage = True)
 	print(f"snr dps de filtrar = {db} dB")
 
 	print("\nSinais 1D:\n")
@@ -392,12 +392,12 @@ def main():
 	mostra_WT(transformado, dt)
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma")
-	transf_n_linear = hard_thresholding(transformado, sigma, ) 
+	transf_n_linear = hard_thresholding(transformado, sigma, "db2") 
 	mostra_WT(transf_n_linear, dt) 
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2")
-	mostra_sinal(reconstroi, tempos, "r")
+	mostra_sinal(transf_n_linear, tempos, "r")
 
-	db = snr(sinal, reconstroi)
+	db = snr(sinal, transf_n_linear)
 	print(f"snr dps de filtrar = {db} dB")
 	'''
 	snr_db = estima_snr_wavelet(transformado, sinal, 700)
