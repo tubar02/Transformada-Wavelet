@@ -1,0 +1,1 @@
+Tendo os códigos desenvolvidos para o problema anterior, implementar as métricas de avaliação SNR e SSIM, e os processamentos por hard e soft thresholding, a partir da técnica de limiarização universal.
