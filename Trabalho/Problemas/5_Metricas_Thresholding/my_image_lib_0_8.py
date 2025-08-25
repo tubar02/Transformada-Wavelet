@@ -421,7 +421,6 @@ class Image:
 		imagem = self._cria_arquivo(outputpath, matriz)
 		return imagem
 
-
 	#mascaras
 	def mascara_bin(self, limite, maior = True): #cria uma máscara binária
 		mascara = [] #inicializa a mascara
@@ -652,18 +651,16 @@ class Ruido(): #classe para acrescentar ruído em imagens digitais
 
 #funções úteis
 def pgm_from_matrix(outputpath, matrix):
-	matrix = [[int(round(i)) for i in linha] for linha in matrix]
+	matriz = [[int(round(i)) for i in linha] for linha in matrix]
 
 	with open(outputpath, "w") as arquivo:
 			arquivo.write("P2" + "\n") #escreve o número mágico
-			arquivo.write(str(len(matrix[0])) + " " + str(len(matrix)) + "\n") #escreve as dimensões
-
-			imagem = deepcopy(matrix)
+			arquivo.write(str(len(matriz[0])) + " " + str(len(matriz)) + "\n") #escreve as dimensões
 			
-			maximo_imagem = Image._max_matriz(imagem) #escreve a intensidade máxima
+			maximo_imagem = Image._max_matriz(matriz) #escreve a intensidade máxima
 			arquivo.write(str(maximo_imagem) + "\n")
 			
-			Image._escreve_pixels(arquivo, imagem)
+			Image._escreve_pixels(arquivo, matriz)
 	
 	return Image(outputpath) #retorna a imagem criada
 

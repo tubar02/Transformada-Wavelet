@@ -349,10 +349,9 @@ def hard_thresholding(coeficientes, sigma, familia = None, isImage = False):
 			novos_detalhes = []
 			for detalhe in detalhes:
 				limiar = visu_shrink(detalhe, sigma)
-				detalhe = np.asarray([[i if np.abs(i) >= limiar else 0 for i in linha] for linha in detalhe])
-				novos_detalhes.append(detalhe)
-			novos_coefs.append(novos_detalhes)
-		novos_coefs = tuple(novos_coefs)
+				novo_detalhe = np.asarray([[i if np.abs(i) >= limiar else 0 for i in linha] for linha in detalhe])
+				novos_detalhes.append(novo_detalhe)
+			novos_coefs.append(tuple(novos_detalhes))
 		coeficientes.coef = novos_coefs
 		return coeficientes
 
@@ -361,20 +360,20 @@ def main():
 
 	sinal, _, _ = le_arquivo_sinal("Imagens//MRI.pgm", True)
 	mostra_sinal(sinal, isImage = True)
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 8, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 20, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
 	mostra_sinal(ruidoso, isImage = True)
 
 	snr_db = snr(sinal, ruidoso, isImage = True)
 	print(f"snr original = {snr_db} dB")
 
 	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 2, True)
-	mostra_WT(transformado, isImage = True, level = 2)
+	mostra_WT(transformado, isImage = True, level = 1)
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma", isImage = True)
 	transf_n_linear = hard_thresholding(transformado, sigma, isImage = True)
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, isImage = True, outputpath = "Imagens//MRI_hard_visu.pgm")
 	transf_n_linear = aplica_DTWT_em_sinal(reconstroi, "db2", 2, True)
-	mostra_WT(transf_n_linear, isImage = True, level = 2) 
+	mostra_WT(transf_n_linear, isImage = True, level = 1) 
 	mostra_sinal(reconstroi, isImage = True)
 
 	db = snr(sinal, transf_n_linear, isImage = True)
