@@ -294,7 +294,6 @@ def snr(original, degradado = None, ruido = None, retorno = "db", isImage = Fals
 	- retorno: "db" (default), "linear" ou "sigma"
 	"""
 
-	original, degradado = deepcopy(original), deepcopy(degradado)
 	_align_same_shape(original, degradado, isImage)
 
 	if not isImage:
@@ -303,9 +302,6 @@ def snr(original, degradado = None, ruido = None, retorno = "db", isImage = Fals
 			ruido_gauss = degradado - original
 		else:
 			ruido_gauss = ruido
-
-		p_sig = potencia_media(original)
-		p_rui = potencia_media(ruido_gauss)
 	else:
 		if ruido is None:
 			assert degradado is not None, "Passe 'degradado' ou 'ruido'."
@@ -313,32 +309,45 @@ def snr(original, degradado = None, ruido = None, retorno = "db", isImage = Fals
 		else:
 			ruido_gauss = ruido
 
-		p_sig = potencia_media(original, isImage)
-		p_rui = potencia_media(ruido_gauss)
+	p_sig = potencia_media(original, isImage)
+	p_rui = potencia_media(ruido_gauss)
 
 	snr_lin = p_sig / p_rui
 	if retorno == "db":
 		return converte_snr(snr_lin)
 	elif retorno == "sigma":
-		sigma = sigma_gauss(ruido_gauss.real)
+		if not isImage:
+			sigma = sqrt(p_rui / 2)
+		else:
+			sigma = sqrt(p_rui)
 		return sigma
-	return snr_lin
-'''
-def estima_snr_wavelet(sinal_ruidoso_coeficientes, original, ponto):
-	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1][ponto::])) / (1.17741)
+	elif retorno == "linear":
+		return snr_lin
+
+def estima_snr_wavelet(sinal_ruidoso_coeficientes, original, retorno = "db"):
+	sigma = np.median(np.abs(sinal_ruidoso_coeficientes[-1])) / (1.17741)
 	snr_lin = potencia_media(original) / (2 * sigma ** 2)
 	snr_db = converte_snr(snr_lin)
-	return snr_db
-'''
-def visu_shrink(coeficiente, sigma): 
-	limiar = sigma * sqrt(2 * np.log(coeficiente.size)) 
+	if retorno == "db":
+		return snr_db
+	elif retorno == "sigma":
+		return sigma
+	elif retorno == "linear":
+		return snr_lin
+
+def visu_shrink(sinal, sigma, isImage = False):
+	if isImage:
+		tamanho = np.asarray(sinal.pixel()).size
+	else:
+		tamanho = sinal.size
+
+	limiar = sigma * sqrt(2 * np.log(tamanho)) 
 	return limiar
 
-def hard_thresholding(coeficientes, sigma, familia = None, isImage = False): 
+def hard_thresholding(coeficientes, limiar, isImage = False): 
 	if not isImage:
 		novos_coefs = [coeficientes[0]]
 		for lista in coeficientes[1::]: 
-			limiar = visu_shrink(lista, sigma)
 			lista = np.asarray([i if np.abs(i) >= limiar else 0 for i in lista]) 
 			novos_coefs.append(lista) 
 		return novos_coefs
@@ -348,19 +357,38 @@ def hard_thresholding(coeficientes, sigma, familia = None, isImage = False):
 		for detalhes in coeficientes_wt[1::]:
 			novos_detalhes = []
 			for detalhe in detalhes:
-				limiar = visu_shrink(detalhe, sigma)
 				novo_detalhe = np.asarray([[i if np.abs(i) >= limiar else 0 for i in linha] for linha in detalhe])
+				novos_detalhes.append(novo_detalhe)
+			novos_coefs.append(tuple(novos_detalhes))
+		coeficientes.coef = novos_coefs
+		return coeficientes
+	
+def soft_thresholding(coeficientes, limiar, isImage = False):
+	if not isImage:
+		novos_coefs = [coeficientes[0]]
+		for lista in coeficientes[1::]: 
+			lista = np.asarray([np.sign(i) * (np.abs(i) - limiar) if np.abs(i) >= limiar else 0 for i in lista]) 
+			novos_coefs.append(lista) 
+		return novos_coefs
+	else:
+		coeficientes_wt = coeficientes.coef
+		novos_coefs = [coeficientes_wt[0]]
+		for detalhes in coeficientes_wt[1::]:
+			novos_detalhes = []
+			for detalhe in detalhes:
+				novo_detalhe = np.asarray([[np.sign(i) * (np.abs(i) - limiar) if np.abs(i) >= limiar else 0 for i in linha] for linha in detalhe])
 				novos_detalhes.append(novo_detalhe)
 			novos_coefs.append(tuple(novos_detalhes))
 		coeficientes.coef = novos_coefs
 		return coeficientes
 
 def main():
+	
 	print("\nSinais 2D:\n")
 
 	sinal, _, _ = le_arquivo_sinal("Imagens//MRI.pgm", True)
 	mostra_sinal(sinal, isImage = True)
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 20, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 12, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
 	mostra_sinal(ruidoso, isImage = True)
 
 	snr_db = snr(sinal, ruidoso, isImage = True)
@@ -370,18 +398,19 @@ def main():
 	mostra_WT(transformado, isImage = True, level = 1)
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma", isImage = True)
-	transf_n_linear = hard_thresholding(transformado, sigma, isImage = True)
+	limiar = visu_shrink(sinal, sigma, True)
+	transf_n_linear = soft_thresholding(transformado, limiar, True)
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, isImage = True, outputpath = "Imagens//MRI_hard_visu.pgm")
 	transf_n_linear = aplica_DTWT_em_sinal(reconstroi, "db2", 2, True)
 	mostra_WT(transf_n_linear, isImage = True, level = 1) 
 	mostra_sinal(reconstroi, isImage = True)
 
-	db = snr(sinal, transf_n_linear, isImage = True)
+	db = snr(sinal, reconstroi, isImage = True)
 	print(f"snr dps de filtrar = {db} dB")
-
+	
 	print("\nSinais 1D:\n")
 
-	sinal, tempos, dt = le_arquivo_sinal("Sinais//Partes1234.txt")
+	sinal, tempos, dt = le_arquivo_sinal("Sinais//teste.txt")
 	mostra_sinal(sinal, tempos, "r")
 	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 12)
 	mostra_sinal(ruidoso, tempos, "r")
@@ -389,21 +418,22 @@ def main():
 	snr_db = snr(sinal, ruidoso)
 	print(f"snr original = {snr_db} dB")
 
-	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 3)
+	transformado = aplica_DTWT_em_sinal(ruidoso, "db2", 5)
 	mostra_WT(transformado, dt)
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma")
-	transf_n_linear = hard_thresholding(transformado, sigma, "db2") 
+	limiar = visu_shrink(sinal, sigma)
+	transf_n_linear = soft_thresholding(transformado, limiar) 
 	mostra_WT(transf_n_linear, dt) 
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2")
 	mostra_sinal(reconstroi, tempos, "r")
 
 	db = snr(sinal, reconstroi)
 	print(f"snr dps de filtrar = {db} dB")
-	'''
-	snr_db = estima_snr_wavelet(transformado, sinal, 700)
+	
+	snr_db = estima_snr_wavelet(transformado, sinal)
 	print(f"snr por wavelet = {snr_db}")
-	'''
+	
 	return 0
 
 if __name__ == "__main__":

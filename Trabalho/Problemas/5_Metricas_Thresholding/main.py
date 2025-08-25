@@ -241,7 +241,8 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 			elif escolha2 == "H":
 				original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "), isImage)
 				sigma = ul.snr(original, sinal, retorno = "sigma", isImage = isImage)
-				coeficientes = ul.hard_thresholding(coeficientes, sigma, familia, isImage)
+				limiar = ul.visu_shrink(sinal, sigma)
+				coeficientes = ul.hard_thresholding(coeficientes, limiar, isImage)
 				print("\nO sinal foi filtrado.")
 
 			elif escolha2 == "F":
@@ -302,7 +303,7 @@ def menu_adiciona(sinal, tempos):
 
 				caminho = Path(f'Sinais/{nome_adiciona}.txt')
 				if caminho.exists():
-					sinal_novo, tempos_novo = ul.le_arquivo_sinal(nome_adiciona)
+					sinal_novo, tempos_novo, dt = ul.le_arquivo_sinal(caminho)
 					salvou = False
 				else:
 					print("Esse sinal não existe. Tente novamente.\n")
