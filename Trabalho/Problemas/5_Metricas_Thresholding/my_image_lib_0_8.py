@@ -421,7 +421,6 @@ class Image:
 		imagem = self._cria_arquivo(outputpath, matriz)
 		return imagem
 
-
 	#mascaras
 	def mascara_bin(self, limite, maior = True): #cria uma máscara binária
 		mascara = [] #inicializa a mascara
@@ -588,10 +587,13 @@ class Wavelet_Image(Image):
 	def coeficientes(self):
 		return self.coef  # retorna (LL, (LH, HL, HH))
 
+	def muda_arquivo_saida(self, outputpath):
+		self._local = outputpath
+	
 	def reconstruir(self):
 		matriz_rec = pywt.waverec2(self.coef, self.wavelet)
 		matriz_rec = np.clip(matriz_rec, 0, 255).round().astype(int).tolist()
-		return pgm_from_matrix(self._local[:-4] + "_reconstruida.pgm", matriz_rec)
+		return pgm_from_matrix(self._local, matriz_rec)
 
 	def representar_nivel(self, nivel):
 		"""
@@ -630,7 +632,7 @@ class Ruido(): #classe para acrescentar ruído em imagens digitais
 		self.pixels = self.dimensions[0] * self.dimensions[1] #pixels no total
 	
 	def gauss(self, mu, sigma):
-		ruido = np.random.normal(mu, sigma, (self.dimensions[1], self.dimensions[0])).astype(int)
+		ruido = np.random.normal(mu, sigma, (self.dimensions[1], self.dimensions[0]))
 		for i in range(len(ruido)):
 			for j in range(len(ruido[0])):
 				self.ruido[i][j] = ruido[i][j]
@@ -649,18 +651,16 @@ class Ruido(): #classe para acrescentar ruído em imagens digitais
 
 #funções úteis
 def pgm_from_matrix(outputpath, matrix):
-	matrix = [[int(round(i)) for i in linha] for linha in matrix]
+	matriz = [[int(round(i)) for i in linha] for linha in matrix]
 
 	with open(outputpath, "w") as arquivo:
 			arquivo.write("P2" + "\n") #escreve o número mágico
-			arquivo.write(str(len(matrix[0])) + " " + str(len(matrix)) + "\n") #escreve as dimensões
-
-			imagem = deepcopy(matrix)
+			arquivo.write(str(len(matriz[0])) + " " + str(len(matriz)) + "\n") #escreve as dimensões
 			
-			maximo_imagem = Image._max_matriz(imagem) #escreve a intensidade máxima
+			maximo_imagem = Image._max_matriz(matriz) #escreve a intensidade máxima
 			arquivo.write(str(maximo_imagem) + "\n")
 			
-			Image._escreve_pixels(arquivo, imagem)
+			Image._escreve_pixels(arquivo, matriz)
 	
 	return Image(outputpath) #retorna a imagem criada
 

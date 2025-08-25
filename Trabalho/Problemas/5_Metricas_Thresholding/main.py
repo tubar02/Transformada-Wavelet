@@ -208,45 +208,55 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 				ul.mostra_WT(coeficientes, dt, escolha, isImage)
 
 		elif escolha == "P":
-			if isImage:
+			print("Você escolheu filtrar o sinal transformado.")
+			escolha2 = input("\nVocê deseja usar o filtro original (O) (1D), hard thresholding (H) ou soft thresholding (S)?").upper()
+
+			if escolha2 == "O":
+				if isImage:
+					print("Filtro não disponível para sinais 2D.")
+					continue
+
+				print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
+
+				tamanho = len(sinal)
+
+				print(f"Seu sinal original possui {tamanho} pontos.\n")
+
+				if level == 1:
+					entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
+				else:
+					entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
+
+				nivel = int(input(entrada))
+
+				if nivel != 0:
+					nivel = nivel * (-1)
+
+				indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
+				
+				coeficientes[nivel][indice::] = 0
+
+				print("\nSeu sinal foi filtrado.")
+
+			elif escolha2 == "H":
+				original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "), isImage)
+				sigma = ul.snr(original, sinal, retorno = "sigma", isImage = isImage)
+				limiar = ul.visu_shrink(sinal, sigma)
+				coeficientes = ul.hard_thresholding(coeficientes, limiar, isImage)
+				print("\nO sinal foi filtrado.")
+
+			elif escolha2 == "F":
 				pass
-			else:
-				print("Você escolheu filtrar o sinal transformado.")
-				escolha2 = input("\nVocê deseja usar o filtro original (O), hard thresholding (H) ou soft thresholding (S)?").upper()
-
-				if escolha2 == "O":
-					print("\nEste filtro funciona zerando todos os coeficientes de um nível a partir de um dado índice.")
-
-					tamanho = len(sinal)
-
-					print(f"Seu sinal original possui {tamanho} pontos.\n")
-
-					if level == 1:
-						entrada = f"Entre com o nível que deseja filtrar (1 para detalhe, ou 0 para aproximação): "
-					else:
-						entrada = f"Entre com o nível que deseja filtrar (1 a {level} para detalhe, ou 0 para aproximação): "
-
-					nivel = int(input(entrada))
-
-					if nivel != 0:
-						nivel = nivel * (-1)
-
-					indice = int(input(f"Entre com um índice de 0 a {len(coeficientes[nivel])} a partir do qual os coeficientes serão zerados: "))			
-					
-					coeficientes[nivel][indice::] = 0
-
-					print("\nSeu sinal foi filtrado.")
-
-				elif escolha2 == "H":
-					original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
-					limiar = ul.visu_shrink(sinal, original)
-					coeficientes = ul.hard_thresholding(coeficientes, limiar)
 
 		elif escolha == "I":
 			print("Você escolheu salvar a IDTWT em um arquivo.")
-
-			sinal_rec = ul.aplica_IDTWT_em_sinal(coeficientes, familia, isImage)
-			salvou = salvar_sinal(sinal_rec, tempos)
+			
+			if not isImage:
+				sinal_rec = ul.aplica_IDTWT_em_sinal(coeficientes, familia, isImage)
+				salvou = salvar_sinal(sinal_rec, tempos)
+			else:
+				caminho = "Imagens\\" + input("Entre com o que deseja dar ao sinal filtrado: ") + ".pgm"
+				sinal_rec = ul.aplica_IDTWT_em_sinal(coeficientes, isImage = True, outputpath = caminho)
 
 			print("Deseja visualizar o sinal reconstruído? (y/n)")
 
@@ -293,7 +303,7 @@ def menu_adiciona(sinal, tempos):
 
 				caminho = Path(f'Sinais/{nome_adiciona}.txt')
 				if caminho.exists():
-					sinal_novo, tempos_novo = ul.le_arquivo_sinal(nome_adiciona)
+					sinal_novo, tempos_novo, dt = ul.le_arquivo_sinal(caminho)
 					salvou = False
 				else:
 					print("Esse sinal não existe. Tente novamente.\n")
@@ -585,7 +595,10 @@ def menu_muda_sinal(sinal, tempos, dt):
 
 			if caminho.exists() and salvou:
 				nome_sinal = nome_foca
-				sinal, tempos, dt = ul.le_arquivo_sinal(caminho, isImage)
+				if isImage:
+					sinal, _, _ = ul.le_arquivo_sinal(caminho, True)
+				else:
+					sinal, tempos, dt = ul.le_arquivo_sinal(caminho)
 				print("\nO foco foi alterado.")
 			elif not salvou:
 				print("Você tem alterações não salvas, tem certeza que deseja continuar? (y/n)")
@@ -622,8 +635,7 @@ def menu_muda_sinal(sinal, tempos, dt):
 		elif escolha == "C":
 			print("Você escolheu calcular o SNR do sinal.")
 			original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "), isImage)
-			degradado, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal degradado: "), isImage)
-			snr = ul.snr(original, degradado, isImage = isImage)
+			snr = ul.snr(original, sinal, isImage = isImage)
 			print(f"Esse sinal possui SNR de {snr}")
 
 		elif escolha == "M":
