@@ -239,10 +239,9 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 				print("\nSeu sinal foi filtrado.")
 
 			elif escolha2 == "H":
-				original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "))
+				original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "), isImage)
 				sigma = ul.snr(original, sinal, retorno = "sigma", isImage = isImage)
-				sinal_filtrado = ul.hard_thresholding(coeficientes, sigma, isImage)
-				coeficientes = ul.aplica_DTWT_em_sinal(sinal_filtrado, familia, level, isImage)
+				coeficientes = ul.hard_thresholding(coeficientes, sigma, familia, isImage)
 				print("\nO sinal foi filtrado.")
 
 			elif escolha2 == "F":
@@ -250,9 +249,13 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 
 		elif escolha == "I":
 			print("Você escolheu salvar a IDTWT em um arquivo.")
-
-			sinal_rec = ul.aplica_IDTWT_em_sinal(coeficientes, familia, isImage)
-			salvou = salvar_sinal(sinal_rec, tempos)
+			
+			if not isImage:
+				sinal_rec = ul.aplica_IDTWT_em_sinal(coeficientes, familia, isImage)
+				salvou = salvar_sinal(sinal_rec, tempos)
+			else:
+				caminho = "Imagens\\" + input("Entre com o que deseja dar ao sinal filtrado: ") + ".pgm"
+				sinal_rec = ul.aplica_IDTWT_em_sinal(coeficientes, isImage = True, outputpath = caminho)
 
 			print("Deseja visualizar o sinal reconstruído? (y/n)")
 
@@ -592,7 +595,7 @@ def menu_muda_sinal(sinal, tempos, dt):
 			if caminho.exists() and salvou:
 				nome_sinal = nome_foca
 				if isImage:
-					sinal = ul.le_arquivo_sinal(caminho, True)
+					sinal, _, _ = ul.le_arquivo_sinal(caminho, True)
 				else:
 					sinal, tempos, dt = ul.le_arquivo_sinal(caminho)
 				print("\nO foco foi alterado.")

@@ -190,7 +190,8 @@ def mostra_WT(coeficientes, dt = None, componente = "m", isImage = False, level 
 
 def aplica_IDTWT_em_sinal(coeficientes, familia = None, isImage = False, outputpath = None):
 	if isImage:
-		coeficientes.muda_arquivo_saida(outputpath)
+		if outputpath:
+			coeficientes.muda_arquivo_saida(outputpath)
 		imagem_rec = coeficientes.reconstruir()
 		return imagem_rec
 
@@ -360,7 +361,7 @@ def main():
 
 	sinal, _, _ = le_arquivo_sinal("Imagens//MRI.pgm", True)
 	mostra_sinal(sinal, isImage = True)
-	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 15, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
+	ruidoso = adiciona_ruido(sinal, mode = "snr", param = 8, isImage = True, outputpath = "Imagens//MRI_gauss.pgm")
 	mostra_sinal(ruidoso, isImage = True)
 
 	snr_db = snr(sinal, ruidoso, isImage = True)
@@ -371,8 +372,9 @@ def main():
 
 	sigma = snr(sinal, ruidoso, retorno = "sigma", isImage = True)
 	transf_n_linear = hard_thresholding(transformado, sigma, isImage = True)
-	mostra_WT(transf_n_linear, isImage = True, level = 2) 
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, isImage = True, outputpath = "Imagens//MRI_hard_visu.pgm")
+	transf_n_linear = aplica_DTWT_em_sinal(reconstroi, "db2", 2, True)
+	mostra_WT(transf_n_linear, isImage = True, level = 2) 
 	mostra_sinal(reconstroi, isImage = True)
 
 	db = snr(sinal, transf_n_linear, isImage = True)
@@ -395,9 +397,9 @@ def main():
 	transf_n_linear = hard_thresholding(transformado, sigma, "db2") 
 	mostra_WT(transf_n_linear, dt) 
 	reconstroi = aplica_IDTWT_em_sinal(transf_n_linear, "db2")
-	mostra_sinal(transf_n_linear, tempos, "r")
+	mostra_sinal(reconstroi, tempos, "r")
 
-	db = snr(sinal, transf_n_linear)
+	db = snr(sinal, reconstroi)
 	print(f"snr dps de filtrar = {db} dB")
 	'''
 	snr_db = estima_snr_wavelet(transformado, sinal, 700)
