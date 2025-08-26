@@ -22,5 +22,5 @@ sns.scatterplot(data=df, x="input_snr_db", y="output_snr_db",
 plt.plot([0,30],[0,30],"--",color="gray")  # linha de referência
 plt.title("SNR inicial vs final")
 plt.ylabel("SNR da imagem filtrada")
-plt.xlabel("SNR da imagem ruidosa")
+plt.xlabel("SNR da imagem ruidosa")	
 plt.show()
