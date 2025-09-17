@@ -104,6 +104,7 @@ def mostra_FT(ft, frequencia = None, componente = None, ppm = False, isImage = F
 
 		if ppm:
 			plt.xlabel('Deslocamento Químico (ppm)')
+			plt.gca().invert_xaxis()
 		else:
 			plt.xlabel('Frequência (Hz)')
 			

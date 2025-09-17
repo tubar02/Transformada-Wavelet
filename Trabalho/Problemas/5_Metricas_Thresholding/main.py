@@ -322,7 +322,7 @@ def menu_adiciona(sinal, tempos):
 		elif escolha == "N":
 			escolha2 = "Y"
 			while escolha2 == "Y":
-				sinal_novo, tempos_novo = menu_cria_sinal()
+				sinal_novo, tempos_novo, dt = menu_cria_sinal()
 				salvou = False
 
 				sinal += sinal_novo
