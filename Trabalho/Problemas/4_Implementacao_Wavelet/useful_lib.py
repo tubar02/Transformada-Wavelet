@@ -181,7 +181,7 @@ def mostra_WT(coeficientes, dt = None, componente = "m", isImage = False, level 
 			faixa = f"{f_low:.1f}–{f_high:.1f} Hz"
 			
 			plt.title(faixa)
-			plt.legend()
+			#plt.legend()
 			plt.grid(True)
 
 		plt.tight_layout()
