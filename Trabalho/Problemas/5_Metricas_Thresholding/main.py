@@ -241,7 +241,7 @@ def menu_wavelet(sinal, tempos, dt, isImage):
 			elif escolha2 == "H":
 				original, _, _ = ul.le_arquivo_sinal(input("Entre com o caminho do sinal original: "), isImage)
 				sigma = ul.snr(original, sinal, retorno = "sigma", isImage = isImage)
-				limiar = ul.visu_shrink(sinal, sigma)
+				limiar = ul.visu_shrink(sinal, sigma, isImage = isImage)
 				coeficientes = ul.hard_thresholding(coeficientes, limiar, isImage)
 				print("\nO sinal foi filtrado.")
 
